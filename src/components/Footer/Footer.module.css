@@ -1,0 +1,90 @@
+.footer {
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
+  margin-top: 5px;
+}
+
+.mainSection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 5px 20px;
+  margin: 0 auto;
+}
+
+.columnImage {
+  min-width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.columnImage img {
+  object-fit: cover;
+}
+
+.columnCard {
+  display: flex;
+  padding: 5px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
+}
+
+.card {
+  background-color: var(--color-footer-card-bg);
+  color: var(--color-primary-dark2);
+  border-radius: 5px;
+  padding: 15px 10px;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.cardSubtitle {
+  font-size: 0.95rem;
+  margin: 0 0 8px 0;
+  opacity: 0.9;
+}
+
+.cardSubtitle a {
+  color: var(--color-footer-accent);
+}
+
+.cardSubtitle a:hover {
+  text-decoration: underline;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.socialLinks a {
+  display: inline-flex;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.socialLinks a:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.copyrightSection {
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.875rem;
+  background-color: var(--color-copy-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 600px) {
+  .mainSection {
+    flex-direction: column;
+  }
+}
