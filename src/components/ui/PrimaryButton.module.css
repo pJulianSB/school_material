@@ -1,24 +1,28 @@
 .primaryButton {
   margin-top: 8px;
   border-radius: 30px;
-  padding: 10px 16px;
+  padding: 10px 20px;
   font-size: 15px;
   font-weight: 600;
-  background-color: #1e5bb8;
+  background-color: var(--color-primary);
   color: #ffffff;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.05s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.05s ease;
 }
 
 .primaryButton:hover {
-  background-color: #174a93;
-  box-shadow: 0 10px 24px rgba(15, 76, 129, 0.35);
+  background-color: var(--color-primary-dark);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 .primaryButton:active {
   transform: translateY(1px);
-  box-shadow: 0 6px 16px rgba(15, 76, 129, 0.45);
+  background-color: var(--color-primary-dark2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 .primaryButton:disabled {
@@ -29,10 +33,11 @@
 
 @media (prefers-color-scheme: dark) {
   .primaryButton {
-    background-color: #2f63c5;
+    background-color: var(--color-primary);
+    color: var(--foreground);
   }
 
   .primaryButton:hover {
-    background-color: #2855a7;
+    background-color: var(--color-primary-dark);
   }
 }

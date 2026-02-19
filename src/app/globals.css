@@ -37,16 +37,6 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-
-    --color-footer-bg: #163861;
-    --color-footer-card-bg: #020817;
-    --color-footer-text: #ededed;
-    --color-footer-accent: #2f63c5;
-
-    --color-header-bg: #163861;
-    --color-header-text: #ededed;
-    --color-nav-link: rgba(237, 237, 237, 0.85);
-    --color-nav-active: #ededed;
   }
 }
 
