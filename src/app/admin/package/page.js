@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./company.module.css";
+import styles from "./package.module.css";
 
-export default function CompanyPage() {
+export default function PackagePage() {
 
   return (
     <div className={styles.page}>
       <section className={styles.card}>
           
-        <h1>Empresa</h1>
+        <h1>Package</h1>
 
       </section>
     </div>

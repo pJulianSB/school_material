@@ -8,12 +8,8 @@ export default function AdminPage() {
     <div className={styles.page}>
       <section className={styles.card}>
           
-        <PrimaryButton
-        type="submit"
-        disabled={false}
-        >
-            AppEducativa
-        </PrimaryButton>
+      <h1>Ventas</h1>
+
       </section>
     </div>
   );
