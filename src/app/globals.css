@@ -14,7 +14,8 @@
   --color-primary-light3: #FAB7FF;
   --color-secondary: #D543DF;
   --color-tertiary: #F78CFF;
-  --color-four: #946FB3;
+  --color-four: #360782;
+  --color-five: #5A1B84;
 
   /* Footer */
   --color-footer-bg: #FCE7FE;
@@ -31,12 +32,24 @@
   --color-header-bg: #ffffff;
   --color-header-text: #7a0683;
 
+  /* Form inputs (Input, TextArea, Select) */
+  --input-border: var(--color-primary-light3);
+  --input-border-focus: var(--color-primary);
+  --input-placeholder: var(--color-four);
+  --input-focus-ring: rgba(122, 6, 131, 0.2);
+  --input-bg-focus: var(--color-primary-light);
+
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --input-border-dark: var(--color-primary-dark2);
+    --input-bg-dark: var(--background);
+    --input-placeholder-dark: var(--color-four);
+    --input-focus-ring-dark: rgba(212, 67, 223, 0.35);
   }
 }
 
@@ -60,13 +73,13 @@ body {
 }
 
 .layoutContent {
-  flex: 1;
+  margin: 0px;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  padding: 0px;
+  margin: 0px;
 }
 
 a {

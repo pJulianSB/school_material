@@ -8,7 +8,7 @@ export default function AdminPage() {
     <div className={styles.page}>
       <section className={styles.card}>
           
-      <h1>Admin</h1>
+      <h1>Ventas</h1>
 
       </section>
     </div>

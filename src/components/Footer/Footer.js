@@ -62,7 +62,7 @@ export function Footer() {
         </div>
       </section>
       <section className={styles.copyrightSection}>
-        <p>Copyright 2026 - Bigpro SAS </p>
+        <p>Copyright 2026 - Bigpro SAS - All Rights Reserved </p>
       </section>
     </footer>
   );
