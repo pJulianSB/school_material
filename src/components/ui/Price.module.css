@@ -1,0 +1,11 @@
+.price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e5bb8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .price {
+    color: #4b7ad6;
+  }
+}

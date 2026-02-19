@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Input } from "app/components/ui/Input";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
-import styles from "./company.module.css";
+import styles from "./login.module.css";
 
-export default function CompanyPage() {
+export default function LoginPage() {
   const [username, setUsername] = useState("");
 
   return (
@@ -16,7 +16,7 @@ export default function CompanyPage() {
           type="submit"
           disabled={false}
           >
-              Company
+              Ingresar
           </PrimaryButton>
         </section>
     </div>

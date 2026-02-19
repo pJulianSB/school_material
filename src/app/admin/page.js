@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "app/components/ui/Button";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import styles from "./admin.module.css";
 
 export default function AdminPage() {
@@ -8,13 +8,12 @@ export default function AdminPage() {
     <div className={styles.page}>
       <section className={styles.card}>
           
-        <Button
+        <PrimaryButton
         type="submit"
-        className={styles.button}
         disabled={false}
         >
             AppEducativa
-        </Button>
+        </PrimaryButton>
       </section>
     </div>
   );

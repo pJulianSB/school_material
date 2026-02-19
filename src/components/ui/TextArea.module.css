@@ -1,0 +1,40 @@
+.textArea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #c2d4f2;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 4em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.textArea::placeholder {
+  color: #97a8c1;
+}
+
+.textArea:focus {
+  border-color: #1e5bb8;
+  box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.2);
+  background-color: #f4f7ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .textArea {
+    background-color: #020817;
+    border-color: #324873;
+    color: #e6f0ff;
+  }
+
+  .textArea::placeholder {
+    color: #7089b2;
+  }
+
+  .textArea:focus {
+    border-color: #4b7ad6;
+    box-shadow: 0 0 0 3px rgba(75, 122, 214, 0.35);
+    background-color: #020817;
+  }
+}
