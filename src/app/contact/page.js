@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "app/components/ui/Button";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import styles from "./contact.module.css";
 
 export default function ContactPage() {
@@ -8,13 +8,12 @@ export default function ContactPage() {
     <div className={styles.page}>
       <section className={styles.card}>
           
-        <Button
+        <PrimaryButton
         type="submit"
-        className={styles.button}
         disabled={false}
         >
             Contact
-        </Button>
+        </PrimaryButton>
       </section>
     </div>
   );

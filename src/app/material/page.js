@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "app/components/ui/Input";
-import { Button } from "app/components/ui/Button";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import styles from "./material.module.css";
 
 export default function MaterialPage() {
@@ -22,13 +22,12 @@ export default function MaterialPage() {
             autoComplete="username"
         />
           
-        <Button
+        <PrimaryButton
         type="submit"
-        className={styles.button}
         disabled={!username}
         >
             Login
-        </Button>
+        </PrimaryButton>
       </section>
     </div>
   );
