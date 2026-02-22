@@ -1,0 +1,86 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.mainLabel {
+  font-weight: 600;
+  color: var(--color-primary-dark2);
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fileNameLabel {
+  font-size: 0.9rem;
+  color: var(--foreground);
+  word-break: break-word;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.primaryLikeButton {
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.05s ease;
+}
+
+.primaryLikeButton:hover:enabled {
+  background-color: var(--color-primary-dark);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.primaryLikeButton:active:enabled {
+  transform: translateY(1px);
+  background-color: var(--color-primary-dark2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.primaryLikeButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.urlBlock {
+  min-height: 22px;
+}
+
+.urlLink {
+  color: var(--color-primary);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.urlFallback {
+  color: var(--color-five);
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mainLabel {
+    color: var(--foreground);
+  }
+
+  .primaryLikeButton {
+    color: var(--foreground);
+  }
+}
+

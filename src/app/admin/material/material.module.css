@@ -1,31 +1,50 @@
 .page {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: center;
     padding: 10px;
   }
   
   .card {
     width: 100%;
-    max-width: 420px;
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 10px;
     display: flex;
+    align-items: center;
     flex-direction: column;
   }
 
   .formMaterial {
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     gap: 16px;
     margin-top: 16px;
+  }
+
+  .columnA {
+    width: 30%;
+  }
+
+  .columnB {
+    width: 30%;
+  }
+
+  .documentContainer {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
   }
 
   .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin-bottom: 16px;
   }
 
   .field select {
