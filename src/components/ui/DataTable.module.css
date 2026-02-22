@@ -47,10 +47,18 @@
    background-color: var(--color-primary-light3);
  }
  
- .cell {
-   padding: 8px 12px;
-   border-bottom: 1px solid var(--color-primary-light2);
- }
+.cell {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-primary-light2);
+}
+
+.cellButton {
+  vertical-align: middle;
+}
+
+.actionButton {
+  margin-top: 0;
+}
  
  .emptyRow .cell {
    text-align: center;

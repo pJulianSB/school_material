@@ -1,24 +1,27 @@
- "use client";
- 
- import React from "react";
- import styles from "./DataTable.module.css";
- 
- export function DataTable({
-   columns = [],
-   data = [],
-   page = 1,
-   pageSize = 10,
-   totalItems = 0,
-   pageSizeOptions = [10, 15, 20],
-   sortBy = null,
-   filters = null,
-   onSortChange,
-   onPageChange,
-   onPageSizeChange,
-   onFilterChange,
-   renderFilterCell,
-   className,
- }) {
+"use client";
+
+import React from "react";
+import styles from "./DataTable.module.css";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
+
+export function DataTable({
+  columns = [],
+  data = [],
+  page = 1,
+  pageSize = 10,
+  totalItems = 0,
+  pageSizeOptions = [10, 15, 20],
+  sortBy = null,
+  filters = null,
+  onSortChange,
+  onPageChange,
+  onPageSizeChange,
+  onFilterChange,
+  renderFilterCell,
+  actionButtonLabel,
+  onActionClick,
+  className,
+}) {
    const hasFiltersRow = Boolean(
     (filters != null && onFilterChange) && columns.some((c) => c.filter)
   );
@@ -94,7 +97,7 @@
             <tr className={styles.filtersRow}>
               {columns.map((column) => (
                 <th key={column.id} className={styles.headerCell}>
-                  {column.filter ? (
+                  {column.type === "button" ? null : column.filter ? (
                     renderFilterCell ? (
                       renderFilterCell(column, filters || {}, onFilterChange)
                     ) : (
@@ -115,7 +118,10 @@
           )}
            <tr className={styles.headerRow}>
              {columns.map((column) => {
-               const isSortable = Boolean(column.sortable && onSortChange);
+               const isButtonColumn = column.type === "button";
+               const isSortable = Boolean(
+                 !isButtonColumn && column.sortable && onSortChange
+               );
                const ariaSort = getAriaSort(column);
                const isActiveSort =
                  sortBy && sortBy.columnId === column.id && !!sortBy.direction;
@@ -163,6 +169,28 @@
              data.map((row, rowIndex) => (
                <tr key={row.id ?? rowIndex} className={styles.bodyRow}>
                  {columns.map((column) => {
+                   if (
+                     column.type === "button" &&
+                     actionButtonLabel &&
+                     onActionClick
+                   ) {
+                     const rowId = row.id ?? rowIndex;
+                     return (
+                       <td
+                         key={column.id}
+                         className={`${styles.cell} ${styles.cellButton}`}
+                       >
+                         <PrimaryButton
+                           type="button"
+                           className={styles.actionButton}
+                           onClick={() => onActionClick(rowId)}
+                         >
+                           {actionButtonLabel}
+                         </PrimaryButton>
+                       </td>
+                     );
+                   }
+
                    let value;
                    if (typeof column.accessor === "function") {
                      value = column.accessor(row);
@@ -171,7 +199,7 @@
                    } else {
                      value = row[column.id];
                    }
- 
+
                    return (
                      <td key={column.id} className={styles.cell}>
                        {value != null ? String(value) : ""}
