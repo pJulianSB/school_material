@@ -7,11 +7,29 @@
   
   .card {
     width: 100%;
+    max-width: 420px;
     background-color: #ffffff;
     border-radius: 16px;
     padding: 10px;
     display: flex;
     flex-direction: column;
+  }
+
+  .formMaterial {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field select {
+    width: 100%;
   }
   
   @media (prefers-color-scheme: dark) {
