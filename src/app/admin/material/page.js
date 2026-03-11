@@ -5,6 +5,9 @@ import styles from "./material.module.css";
 import { Select } from "app/components/ui/Select";
 import { TextArea } from "app/components/ui/TextArea";
 import { LoadMaterial } from "app/components/LoadMaterial/LoadMaterial";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
+import { TertiaryButton } from "app/components/ui/TertiaryButton";
+
 import { TYPE_MATERIAL_OPTIONS, GRADES_OPTIONS, SUBJECTS_OPTIONS, MATERIAL_STATUS_OPTIONS } from "app/utils/selectOptions";
 
 export default function MaterialPage() {
@@ -15,20 +18,31 @@ export default function MaterialPage() {
   const [status, setStatus] = useState("");
   const [url, setUrl] = useState("");
   const [packages, setPackages] = useState("0");
-  const [documentName, setDocumentName] = useState("");
+  const [material, setMaterial] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
 
   const handleUploadMaterial = async (file) => {
     // Simula el proceso de carga en DB/storage
     await new Promise((resolve) => setTimeout(resolve, 900));
     const generatedUrl = URL.createObjectURL(file);
-    setDocumentName(file.name);
+    setMaterial(file);
     setUrl(generatedUrl);
     return generatedUrl;
   };
 
+  const handleCancel = () => {
+    setIsEdit(false);
+    setMaterial("");
+    setUrl("");
+    setPackages("0");
+    setDescription("");
+    setGrade("");
+    setSubject("");
+  };
+
   return (
     <div className={styles.page}>
-      <h2>Detalle del Material</h2>
+      <h2>Detalle del material</h2>
 
       <section className={styles.card}>
         <section className={styles.formMaterial}>
@@ -92,14 +106,26 @@ export default function MaterialPage() {
           </div>
         </section>
         <section className={styles.documentContainer}>
-          <div className={styles.field}>
-            Documento cargado: {documentName || "Sin documento"}
-          </div>
           <LoadMaterial
-            label="Documento PDF"
+            material= {material}
             existingDocumentUrl={url}
             onUpload={handleUploadMaterial}
           />
+        </section>
+        <section className={styles.rowBtns}>
+          <PrimaryButton
+            type="button"
+            className={styles.primaryButton}
+            onClick={handleUploadMaterial}
+            >
+            { isEdit ? "Editar documento" : "Crear documento" }
+          </PrimaryButton>
+          <TertiaryButton
+            type="button"
+            disabled={false}
+            >
+              Cancelar
+          </TertiaryButton>
         </section>
       </section>
     </div>

@@ -6,11 +6,18 @@
 }
 
 .mainLabel {
-  font-weight: 600;
+  font-weight: 550;
   color: var(--color-primary-dark2);
 }
 
 .fileRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.fileRowBtns {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -28,11 +35,11 @@
 }
 
 .primaryLikeButton {
-  border-radius: 30px;
-  padding: 10px 20px;
-  font-size: 15px;
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 13px;
   font-weight: 600;
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary);
   color: #ffffff;
   border: none;
   cursor: pointer;

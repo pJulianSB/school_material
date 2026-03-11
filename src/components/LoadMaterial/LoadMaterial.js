@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import styles from "./LoadMaterial.module.css";
 
 export function LoadMaterial({
-  label = "Documento PDF",
+  material = "",
   existingDocumentUrl = "",
   onUpload,
 }) {
@@ -49,41 +49,17 @@ export function LoadMaterial({
 
   return (
     <section className={styles.wrapper}>
-      <label className={styles.mainLabel}>{label}</label>
-
       <div className={styles.fileRow}>
-        <span className={styles.fileNameLabel}>
-          {selectedFile ? selectedFile.name : "Ningún archivo seleccionado"}
-        </span>
-
-        <button
-          type="button"
-          className={styles.primaryLikeButton}
-          onClick={handleSelectClick}
-          disabled={isLoading}
-        >
-          Seleccionar Archivo
-        </button>
+        <label className={styles.mainLabel}>Nombre del documento: </label>
+        {material.name ?
+          <label>{material.name}</label>
+        :
+          <span className={styles.urlFallback}>Documento no cargado.</span>
+        }
       </div>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="application/pdf,.pdf"
-        className={styles.hiddenInput}
-        onChange={handleFileChange}
-      />
-
-      <button
-        type="button"
-        className={styles.primaryLikeButton}
-        onClick={handleUploadClick}
-        disabled={!selectedFile || isLoading}
-      >
-        {isLoading ? "Cargando documento..." : "Cargar documento"}
-      </button>
-
       <div className={styles.urlBlock}>
+        <label className={styles.mainLabel}>URL del documento: </label>
         {currentUrl ? (
           <a
             href={currentUrl}
@@ -94,8 +70,45 @@ export function LoadMaterial({
             {currentUrl}
           </a>
         ) : (
-          <span className={styles.urlFallback}>El documento no ha sido guardado</span>
+          <span className={styles.urlFallback}>Documento no cargado.</span>
         )}
+      </div>
+
+      <div className={styles.fileRowBtns}>
+        <div>
+          <label className={styles.mainLabel}>Archivo seleccionado: </label>
+          <span className={styles.fileNameLabel}>
+            {selectedFile ? selectedFile.name : ""}
+          </span>
+        </div>
+
+        <div className={styles.fileRowBtns}>
+          <button
+            type="button"
+            className={styles.primaryLikeButton}
+            onClick={handleSelectClick}
+            disabled={isLoading}
+            >
+            Seleccionar Archivo
+          </button>
+
+          <input
+            ref={inputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            className={styles.hiddenInput}
+            onChange={handleFileChange}
+            />
+
+          <button
+            type="button"
+            className={styles.primaryLikeButton}
+            onClick={handleUploadClick}
+            disabled={!selectedFile || isLoading}
+            >
+            {isLoading ? "Cargando documento..." : "Cargar documento"}
+          </button>
+        </div>
       </div>
     </section>
   );
