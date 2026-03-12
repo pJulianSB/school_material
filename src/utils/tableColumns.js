@@ -16,12 +16,13 @@ export const userColumns = [
     { id: "id", header: "No", field: "id", sortable: true, width: "60px" },
     { id: "date", header: "Fecha", field: "date", sortable: true, filter: true },
     { id: "title", header: "Titulo", field: "title", sortable: true, filter: true },
-    { id: "description", header: "Descripción", field: "description", sortable: false, filter: true },
+    { id: "description", header: "Descripción", field: "description", sortable: false, filter: true,  width: "400px" },
     { id: "subject", header: "Área", field: "subject", sortable: true, filter: true },
     { id: "grade", header: "Grado", field: "grade", sortable: true, filter: true },
     { id: "status", header: "Estado", field: "status", sortable: true, filter: true },
     { id: "price", header: "Precio", field: "price", sortable: true, filter: true },
     { id: "documents", header: "# Docs", field: "documents", sortable: false },
+    { id: "edit", header: "Editar", field: "edit", type: "button" },
   ];
 
   export const documentColumns = [

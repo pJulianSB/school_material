@@ -1,13 +1,17 @@
 .secondaryButton {
-  border-radius: 50px;
+  border-radius: 30px;
   padding: 5px 24px;
   font-size: 13px;
   font-weight: 600;
   background-color: var(--color-primary-light);
-  color: var(--color-primary);;
-  border: 2px solid var(--color-primary);;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.05s ease;
+  transition: 
+    background-color 0.2s ease, 
+    color 0.2s ease, 
+    box-shadow 0.2s ease, 
+    transform 0.05s ease;
 }
 
 .secondaryButton:hover {

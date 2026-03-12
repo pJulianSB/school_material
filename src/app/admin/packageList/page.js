@@ -40,6 +40,10 @@ export default function PackageListPage() {
             setFilters(nextFilters);
             setPage(1);
           }}
+          actionButtonLabel="Editar"
+          onActionClick={(id) => {
+            console.log(id);
+          }}
         />
 
       </section>

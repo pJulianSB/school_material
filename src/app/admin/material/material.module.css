@@ -1,35 +1,84 @@
 .page {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: center;
     padding: 10px;
   }
   
   .card {
     width: 100%;
-    max-width: 420px;
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 10px;
     display: flex;
+    align-items: center;
     flex-direction: column;
   }
 
   .formMaterial {
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     gap: 16px;
     margin-top: 16px;
+  }
+
+  .columnA {
+    width: 35%;
+  }
+
+  .columnB {
+    width: 35%;
+  }
+
+  .documentContainer {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
   }
 
   .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin-bottom: 16px;
   }
 
   .field select {
     width: 100%;
+  }
+
+  .rowBtns {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .errorMessage {
+    margin-top: 12px;
+    color: #b91c1c;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .primaryButton {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.05s ease;
   }
   
   @media (prefers-color-scheme: dark) {
