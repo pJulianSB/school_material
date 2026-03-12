@@ -42,9 +42,9 @@ export function NavBar() {
         aria-current={pathname === "/login" ? "page" : undefined}
       >
         <SecondaryButton
-        type="button"
-        disabled={false}
-        >
+          type="button"
+          disabled={false}
+          >
             Ingresar
         </SecondaryButton>
       </Link>   
