@@ -26,13 +26,13 @@ export const userColumns = [
   ];
 
   export const documentColumns = [
-    { id: "id", header: "No", field: "id", sortable: true, width: "60px" },
+    { id: "serial", header: "No", field: "serial", sortable: true, width: "60px" },
     { id: "type", header: "Tipo", field: "type", sortable: true, filter: true },
     { id: "description", header: "Descripción", field: "description", sortable: false, filter: true },
     { id: "subject", header: "Área", field: "subject", sortable: true, filter: true },
     { id: "grade", header: "Grado", field: "grade", sortable: true, filter: true },
     { id: "status", header: "Estado", field: "status", sortable: true, filter: true },
-    { id: "url", header: "Enlace", field: "url", sortable: false },
+    { id: "material_url", header: "Enlace", field: "material_url", sortable: false },
     { id: "packages", header: "# Paquetes", field: "packages", sortable: false },
   ];
 
