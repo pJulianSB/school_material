@@ -11,17 +11,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Patrón Singleton: Solo inicializa si no hay apps previas
 const databaseId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app, databaseId);
 const storage = getStorage(app);
-
-console.log("-----FIREBASE CONFIG-----");
-console.log("storage:", storage);
-console.log("db:", db);
-console.log("app:", app);
-console.log("-----FIREBASE CONFIG-----");
 
 export { app, db, storage };

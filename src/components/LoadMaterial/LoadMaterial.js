@@ -35,17 +35,10 @@ export function LoadMaterial({
 
   const handleUploadClick = async () => {
     if (!selectedFile || typeof onUpload !== "function") return;
-    console.log("-----selectedFile -----");
-    console.log(selectedFile);
-    console.log("-----selectedFile -----");
 
     try {
       setIsLoading(true);
       const url = await onUpload(selectedFile);
-
-      console.log("-----handleUploadClick -----");
-      console.log(url);
-      console.log("-----handleUploadClick -----");
       if (typeof url === "string" && url.trim() !== "") {
         setUploadedUrl(url);
       }

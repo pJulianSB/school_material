@@ -8,6 +8,8 @@ import { TextArea } from "app/components/ui/TextArea";
 import { LoadMaterial } from "app/components/LoadMaterial/LoadMaterial";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
+import { MissingFields } from "app/components/ui/MissingFields";
+import { sileo, Toaster } from "sileo";
 import { uploadMaterialPdf, createMaterialService, getMaterialLastSerial } from "app/services/materialService";
 import { TYPE_MATERIAL_OPTIONS, GRADES_OPTIONS, SUBJECTS_OPTIONS, MATERIAL_STATUS_OPTIONS } from "app/utils/selectOptions";
 
@@ -23,10 +25,8 @@ export default function MaterialPage() {
   const [material, setMaterial] = useState("");
   const [documentId, setDocumentId] = useState("");
   const [isEdit, setIsEdit] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleUploadMaterial = async (file) => {
-    setErrorMessage("");
     const { id, url: uploadedUrl } = await uploadMaterialPdf(file, { materialType });
 
     setMaterial(file);
@@ -46,7 +46,6 @@ export default function MaterialPage() {
     setGrade("primero");
     setSubject("matematicas");
     setStatus("free");
-    setErrorMessage("");
     router.push("/admin/materialList");
   };
 
@@ -69,20 +68,22 @@ export default function MaterialPage() {
   const createMaterial = async () => {
     const missingFields = [];
 
-    if (!materialType) missingFields.push("tipo de material");
-    if (!grade) missingFields.push("grado");
-    if (!subject) missingFields.push("área");
-    if (!status) missingFields.push("estado");
-    if (!description.trim()) missingFields.push("descripción");
-    if (!material || !material.name) missingFields.push("documento PDF");
-    if (!url) missingFields.push("URL del documento");
+    if (!materialType) missingFields.push("Tipo de material");
+    if (!grade) missingFields.push("Grado");
+    if (!subject) missingFields.push("Área");
+    if (!status) missingFields.push("Estado");
+    if (!description.trim()) missingFields.push("Descripción");
+    if (!material || !material.name) missingFields.push("Seleccionar documento PDF");
+    if (!url) missingFields.push("Guardar documento PDF");
 
     if (missingFields.length > 0) {
-      setErrorMessage(`Completa los campos requeridos: ${missingFields.join(", ")}.`);
+      sileo.error({
+        title: "Error creando el material",
+        description: <MissingFields missingFields={missingFields} />,
+        fill: "#FAB7FF",
+      });
       return;
     }
-
-    setErrorMessage("");
 
     const payload = {
       type: materialType,
@@ -98,20 +99,24 @@ export default function MaterialPage() {
     console.log("-----payload -----");
     console.log(payload);
     console.log("-----payload -----");
-    //const { id } = await createMaterialService(payload);
-    //setDocumentId(id);
+    await createMaterialService(payload);
     setIsEdit(false);
+    sileo.success({
+      title: "Material creado de forma correcta",
+    });
+    router.push("/admin/materialList");
   };
 
   return (
     <div className={styles.page}>
+      <Toaster position="top-right" />
       <h2>{ isEdit ? "Editar material" : "Crear material" }</h2>
 
       <section className={styles.card}>
         <section className={styles.formMaterial}>
           <div className={styles.columnA}>
             <label htmlFor="material-type" className={styles.field}>
-              Tipo de material
+              <div><span className={styles.requiredColor}>*</span>Tipo de material</div>
               <Select
                 id="material-type"
                 name="materialType"
@@ -122,7 +127,7 @@ export default function MaterialPage() {
               />
             </label>
             <label htmlFor="grade" className={styles.field}>
-              Grado
+            <div><span className={styles.requiredColor}>*</span>Grado</div>
               <Select
                 id="grade"
                 name="grade"
@@ -133,7 +138,7 @@ export default function MaterialPage() {
               />
             </label>
             <label htmlFor="subject" className={styles.field}>
-              Área
+            <div><span className={styles.requiredColor}>*</span>Área</div>
               <Select
                 id="subject"
                 name="subject"
@@ -146,7 +151,7 @@ export default function MaterialPage() {
           </div>
           <div className={styles.columnB}>
             <label htmlFor="status" className={styles.field}>
-              Estado
+              <div><span className={styles.requiredColor}>*</span>Estado</div>
               <Select
                 id="status"
                 name="status"
@@ -157,7 +162,7 @@ export default function MaterialPage() {
               />
             </label>
             <label htmlFor="material-description" className={styles.field}>
-              Descripción
+              <div><span className={styles.requiredColor}>*</span>Descripción</div>
               <TextArea
                 id="material-description"
                 name="description"
@@ -180,9 +185,6 @@ export default function MaterialPage() {
             onUpload={handleUploadMaterial}
           />
         </section>
-        {errorMessage ? (
-          <p className={styles.errorMessage}>{errorMessage}</p>
-        ) : null}
         <section className={styles.rowBtns}>
           <PrimaryButton
             type="button"
