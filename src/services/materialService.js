@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "app/lib/firebase/config";
 
@@ -22,7 +22,7 @@ export async function uploadMaterialPdf(file, metadata = {}) {
     }
 
     const safeName = sanitizeFileName(file.name);
-    const uniqueName = `${Date.now()}_${safeName}`;
+    const uniqueName = `${serverTimestamp()}_${safeName}`;
     const storagePath = `material/${uniqueName}`;
     const storageRef = ref(storage, storagePath);
 
@@ -58,7 +58,7 @@ export async function createMaterialService(payload) {
     if (!payload) {
       throw new Error("No hay información para crear el material");
     }
-    const docRef = await addDoc(collection(db, MATERIALS_DOCS_COLLECTION), payload);
+    const docRef = await addDoc(collection(db, MATERIALS_COLLECTION), payload);
     return { id: docRef.id };
 
   } catch (error) {
@@ -93,6 +93,39 @@ export async function getMaterialLastSerial() {
   catch (errorBySerial) {
     console.error("Error getting last Serial in material service layer:", errorByserial);
     throw new Error("No fue posible obtener el consecutivo del material");
+  }
+}
+
+export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
+  try {
+    const constraints = [orderBy("serial", "desc"), limit(pageSize + 1)];
+    if (lastVisible) {
+      constraints.push(startAfter(lastVisible));
+    }
+
+    const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
+    const querySnapshot = await getDocs(q);
+
+    const docs = querySnapshot.docs;
+    const hasMore = docs.length > pageSize;
+    const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
+
+    const items = visibleDocs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const nextLastVisible =
+      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+
+    return {
+      items,
+      lastVisible: nextLastVisible,
+      hasMore,
+    };
+  } catch (error) {
+    console.error("Error getting materials in material service layer:", error);
+    throw new Error("No fue posible obtener los materiales");
   }
 }
 

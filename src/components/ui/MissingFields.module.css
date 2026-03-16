@@ -1,0 +1,16 @@
+.subtitle {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.list {
+  padding-left: 20px;
+}
+
+.item {
+  color: var(--color-primary-dark2);
+  font-weight: 600;
+  font-size: 13px;
+}
