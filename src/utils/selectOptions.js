@@ -30,3 +30,8 @@ export const MATERIAL_STATUS_OPTIONS = [
     { value: "review", label: "En revisión" },
     { value: "assigned", label: "Asignado" },
 ];
+
+export const PACKAGE_STATUS_OPTIONS = [
+    { value: "active", label: "Activo" },
+    { value: "inactive", label: "Inactivo" },
+];

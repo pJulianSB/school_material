@@ -1,15 +1,18 @@
 .sidebar {
+  display: flex;
+  flex-direction: column;
   min-width: 220px;
   min-height: 480px;
   background-color: var(--color-primary-light3);
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
-  padding: 16px 0px;
+  padding: 16px 0;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 4px;
 }
 
@@ -31,4 +34,13 @@
 .link.active {
   color: var(--color-nav-text);
   background-color: var(--color-secondary);
+}
+
+.footer {
+  margin-top: auto;
+  padding: 12px 12px 0;
+}
+
+.signOutButton {
+  width: 100%;
 }
