@@ -22,7 +22,12 @@ export default function MaterialPage() {
   const [subject, setSubject] = useState("matematicas");
   const [status, setStatus] = useState("active");
   const [price, setPrice] = useState("");
-  const [documents, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState([
+    {id: 1, type: "Malla", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor ullamcorper erat volutpat fringilla.", url: "google.com"},
+    {id: 2, type: "Malla", description: "some text", url: "google.com"},
+    {id: 3, type: "Malla", description: "some text", url: "google.com"},
+    {id: 4, type: "Malla", description: "Curabitur viverra imperdiet dui, eu tincidunt nisl ultricies vitae. Aliquam fermentum purus vitae enim dapibus facilisis.", url: "google.com"},
+  ]);
   const [isEdit, setIsEdit] = useState(false);
 
   const handleCancel = () => {
@@ -97,6 +102,14 @@ export default function MaterialPage() {
       router.push("/admin/packageList");
     });
   };
+
+  const handleRemoveDocument = (id) => {
+    setDocuments(documents.filter((document) => document.id !== id));
+  };
+
+  const handleAddDocument = () => {
+    //open modal to add document
+  }
 
   return (
     <div className={styles.page}>
@@ -181,13 +194,19 @@ export default function MaterialPage() {
           </label>
         </section>
         <section className={styles.documentsContainer}>
+          <div className={styles.documentsContainerTitle}>
+            <h3 className={styles.subtitle}>Documentos del paquete</h3>
+            <PrimaryButton
+              type="button"
+              className={styles.primaryButton}
+              onClick={handleAddDocument}
+              >
+              Agregar documento
+            </PrimaryButton>
+          </div>
           <DocPackage
-            index={1}
-            id={12}
-            type={"Malla"}
-            description={"some text"}
-            url={"google.com"}
-            onRemove={() => {}}
+            documents={documents}
+            onRemove={handleRemoveDocument}
           />
         </section>
         <section className={styles.rowBtns}>

@@ -7,6 +7,10 @@
   border-bottom: 1px solid var(--color-primary-light3);
 }
 
+.rowTitle {
+  background-color: var(--color-primary-light2);
+}
+
 .cell {
   display: flex;
   align-items: center;
@@ -14,11 +18,23 @@
   color: var(--color-primary-dark2);
 }
 
+.cellTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
 .indexCell {
+  display: flex;
+  justify-content: center;
   flex: 0 0 48px;
 }
 
 .typeCell {
+  display: flex;
+  justify-content: center;
   flex: 0 0 140px;
 }
 
@@ -38,6 +54,14 @@
   font-weight: 600;
   color: var(--color-primary);
   margin-bottom: 4px;
+}
+
+.emptyLabel {
+  padding-top: 10px;
+  padding-left: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
 }
 
 .iconButton {
