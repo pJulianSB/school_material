@@ -10,11 +10,14 @@ import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { MissingFields } from "app/components/ui/MissingFields";
 import { DocPackage } from "app/components/DocPackage/DocPackage";
+import { SelectDocs } from "app/components/SelectDocs/SelectDocs";
+import { Drawer } from "app/components/Drawer/Drawer";
 import { sileo, Toaster } from "sileo";
 import { createPackageService, getPackageLastSerial } from "app/services/packageService";
+import { getMaterials } from "app/services/materialService";
 import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS } from "app/utils/selectOptions";
 
-export default function MaterialPage() {
+export default function PackagePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -28,7 +31,9 @@ export default function MaterialPage() {
     {id: 3, type: "Malla", description: "some text", url: "google.com"},
     {id: 4, type: "Malla", description: "Curabitur viverra imperdiet dui, eu tincidunt nisl ultricies vitae. Aliquam fermentum purus vitae enim dapibus facilisis.", url: "google.com"},
   ]);
+  const [currentDocuments, setCurrentDocuments] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleCancel = () => {
     setIsEdit(false);
@@ -108,8 +113,23 @@ export default function MaterialPage() {
   };
 
   const handleAddDocument = () => {
-    //open modal to add document
+    console.log("Agregar documento");
+  };
+
+  const handleSelectDocument = async () => {
+    const documents = await fetchDocuments();
+    setCurrentDocuments(documents);
+    setIsDrawerOpen(true);
   }
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
+  const fetchDocuments = async () => {
+    const documents = await getMaterials();
+    return documents.items;
+  };
 
   return (
     <div className={styles.page}>
@@ -199,7 +219,7 @@ export default function MaterialPage() {
             <PrimaryButton
               type="button"
               className={styles.primaryButton}
-              onClick={handleAddDocument}
+              onClick={handleSelectDocument}
               >
               Agregar documento
             </PrimaryButton>
@@ -226,6 +246,18 @@ export default function MaterialPage() {
           </TertiaryButton>
         </section>
       </section>
+      <Drawer
+        isOpen={isDrawerOpen}
+        title="Agregar documentos al paquete"
+        onClose={handleCloseDrawer}
+      >
+        <SelectDocs
+          documents={currentDocuments}
+          subject={subject}
+          grade={grade}
+          onAddDocument={handleAddDocument}
+        />
+      </Drawer>
     </div>
   );
 }
