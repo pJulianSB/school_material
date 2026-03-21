@@ -1,6 +1,7 @@
 import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "app/lib/firebase/config";
+import { TYPE_MATERIAL_MAP, SUBJECTS_MAP, GRADES_MAP, MATERIAL_STATUS_MAP } from "app/utils/selectOptions";
 
 const MATERIALS_DOCS_COLLECTION = "documents";
 const MATERIALS_COLLECTION = "material";
@@ -98,7 +99,7 @@ export async function getMaterialLastSerial() {
 
 export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
   try {
-    const constraints = [orderBy("serial", "desc"), limit(pageSize + 1)];
+    const constraints = [orderBy("serial", "asc"), limit(pageSize + 1)];
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
@@ -112,7 +113,14 @@ export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
 
     const items = visibleDocs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
+      serial: doc.data().serial,
+      description: doc.data().description,
+      type: TYPE_MATERIAL_MAP[doc.data().type],
+      subject: SUBJECTS_MAP[doc.data().subject],
+      grade: GRADES_MAP[doc.data().grade],
+      packages: doc.data().packages,
+      material_url: doc.data().material_url,
+      status: MATERIAL_STATUS_MAP[doc.data().status],
     }));
 
     const nextLastVisible =
