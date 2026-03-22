@@ -6,16 +6,17 @@ const PACKAGE_COLLECTION = "packages";
 
 export const createPackageService = async (packageData) => {
   try {
-    const packagesRef = collection(db, PACKAGE_COLLECTION);
-    const payload = {
+    if (!packageData) {
+      throw new Error("No hay información para crear el paquete");
+    }
+
+    const data = {
       ...packageData,
-      creationDate: serverTimestamp(),
+      creation_date: serverTimestamp(),
       active: true
     };
-
-    const docRef = await addDoc(pa, payload);
-    return docRef.id;
-
+    const docRef = await addDoc(collection(db, PACKAGE_COLLECTION), data);
+    return { id: docRef.id };
   } catch (error) {
     console.error("Error in package service layer:", error);
     throw new Error("It was not possible to create the package");
@@ -68,14 +69,14 @@ export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
     const items = visibleDocs.map((doc) => ({
       id: doc.id,
       serial: doc.data().serial,
-      date: doc.data().date_created.toDate().toLocaleDateString(),
+      date: doc.data().creation_date.toDate().toLocaleDateString(),
       title: doc.data().title,
       description: doc.data().description,
       subject: SUBJECTS_MAP[doc.data().subject],
       grade: GRADES_MAP[doc.data().grade],
       status: PACKAGE_STATUS_MAP[doc.data().status],
       price: doc.data().price,
-      documents: doc.data().documents,
+      total_documents: doc.data().total_documents,
     }));
 
     const nextLastVisible =

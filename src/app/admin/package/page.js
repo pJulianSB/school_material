@@ -25,12 +25,7 @@ export default function PackagePage() {
   const [subject, setSubject] = useState("matematicas");
   const [status, setStatus] = useState("active");
   const [price, setPrice] = useState("");
-  const [documents, setDocuments] = useState([
-    {id: 1, type: "Malla", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor ullamcorper erat volutpat fringilla.", url: "google.com"},
-    {id: 2, type: "Malla", description: "some text", url: "google.com"},
-    {id: 3, type: "Malla", description: "some text", url: "google.com"},
-    {id: 4, type: "Malla", description: "Curabitur viverra imperdiet dui, eu tincidunt nisl ultricies vitae. Aliquam fermentum purus vitae enim dapibus facilisis.", url: "google.com"},
-  ]);
+  const [documents, setDocuments] = useState([]);
   const [currentDocuments, setCurrentDocuments] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -74,7 +69,9 @@ export default function PackagePage() {
     if (!grade) missingFields.push("Grado");
     if (!subject) missingFields.push("Área");
     if (!status) missingFields.push("Estado");
+    if (!price) missingFields.push("Precio");
     if (!description.trim()) missingFields.push("Descripción");
+    if (documents.length === 0) missingFields.push("Debe agregar al menos un documento");
 
     if (missingFields.length > 0) {
       sileo.error({
@@ -85,22 +82,29 @@ export default function PackagePage() {
       return;
     }
 
+    const materials = documents.map((material) => ({
+      id: material.id,
+      type: material.type,
+      description: material.description,
+      document_url: material.document.url,
+      document_id: material.document.id,
+    }));
+
     const payload = {
       title: title,
-      description: description,
-      grade: grade,
-      subject: subject,
-      status: status,
       price: price,
-      documents: documents,
+      description: description,
+      status: status,
+      subject: subject,
+      grade: grade,
+      total_documents: documents.length,
+      materials: materials,
       serial: await getPackageLastSerial(),
-      active: true
     };
     console.log("-----payload -----");
     console.log(payload);
     console.log("-----payload -----");
     await createPackageService(payload);
-    setIsEdit(false);
     sileo.success({
       title: "Paquete creado de forma correcta",
     }).then(() => {

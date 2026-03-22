@@ -23,7 +23,8 @@ export async function uploadMaterialPdf(file, metadata = {}) {
     }
 
     const safeName = sanitizeFileName(file.name);
-    const uniqueName = `${serverTimestamp()}_${safeName}`;
+    const timestamp = Date.now();
+    const uniqueName = `${timestamp}_${safeName}`;
     const storagePath = `material/${uniqueName}`;
     const storageRef = ref(storage, storagePath);
 
@@ -38,16 +39,16 @@ export async function uploadMaterialPdf(file, metadata = {}) {
       name: file.name,
       url: downloadURL,
       path: storagePath,
-      contentType: file.type || "application/pdf",
+      content_type: file.type || "application/pdf",
       size: file.size || 0,
       metadata,
-      creationDate: serverTimestamp(),
+      creation_date: serverTimestamp(),
       active: true,
     };
 
     const docRef = await addDoc(collection(db, MATERIALS_DOCS_COLLECTION), payload);
 
-    return { id: docRef.id, name: file.name, url: downloadURL };
+    return { id: docRef.id, path: storagePath, url: downloadURL };
   } catch (error) {
     console.error("Error in material service layer:", error);
     throw new Error("No fue posible cargar el documento PDF");
@@ -59,7 +60,13 @@ export async function createMaterialService(payload) {
     if (!payload) {
       throw new Error("No hay información para crear el material");
     }
-    const docRef = await addDoc(collection(db, MATERIALS_COLLECTION), payload);
+
+    const data = {
+      ...payload,
+      creation_date: serverTimestamp(),
+      active: true
+    };
+    const docRef = await addDoc(collection(db, MATERIALS_COLLECTION), data);
     return { id: docRef.id };
 
   } catch (error) {
@@ -118,8 +125,8 @@ export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
       type: TYPE_MATERIAL_MAP[doc.data().type],
       subject: SUBJECTS_MAP[doc.data().subject],
       grade: GRADES_MAP[doc.data().grade],
-      packages: doc.data().packages,
-      material_url: doc.data().material_url,
+      total_packages: doc.data().total_packages,
+      material_url: doc.data().material.url,
       status: MATERIAL_STATUS_MAP[doc.data().status],
     }));
 

@@ -22,19 +22,20 @@ export const packageColumns = [
   { id: "grade", header: "Grado", field: "grade", sortable: true, filter: true },
   { id: "status", header: "Estado", field: "status", sortable: true, filter: true },
   { id: "price", header: "Precio", field: "price", sortable: true, filter: true },
-  { id: "documents", header: "# Docs", field: "documents", sortable: false },
+  { id: "total_documents", header: "# Docs", field: "total_documents", sortable: false },
   { id: "edit", header: "Editar", field: "edit", type: "button" },
 ];
 
 export const documentColumns = [
   { id: "serial", header: "No", field: "serial", sortable: true, width: "60px" },
   { id: "type", header: "Tipo", field: "type", sortable: true, filter: true },
-  { id: "description", header: "Descripción", field: "description", sortable: false, filter: true },
+  { id: "description", header: "Descripción", field: "description", sortable: false, filter: true, width: "250px" },
   { id: "subject", header: "Área", field: "subject", sortable: true, filter: true },
   { id: "grade", header: "Grado", field: "grade", sortable: true, filter: true },
   { id: "status", header: "Estado", field: "status", sortable: true, filter: true },
   { id: "material_url", header: "Enlace", field: "material_url", sortable: false },
-  { id: "packages", header: "# Paquetes", field: "packages", sortable: false },
+  { id: "total_packages", header: "# Paquetes", field: "total_packages", sortable: false },
+  { id: "edit", header: "Editar", field: "edit", type: "button" },
 ];
 
 export const billingColumns = [
