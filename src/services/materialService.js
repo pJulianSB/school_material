@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter } from "firebase/firestore";
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "app/lib/firebase/config";
 import { TYPE_MATERIAL_MAP, SUBJECTS_MAP, GRADES_MAP, MATERIAL_STATUS_MAP } from "app/utils/selectOptions";
@@ -104,34 +104,45 @@ export async function getMaterialLastSerial() {
   }
 }
 
-export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
+export function parseMaterials(docs) {
+  const items = docs.map((doc) => ({
+    id: doc.id,
+    serial: doc.data().serial,
+    description: doc.data().description,
+    type: TYPE_MATERIAL_MAP[doc.data().type],
+    subject: SUBJECTS_MAP[doc.data().subject],
+    grade: GRADES_MAP[doc.data().grade],
+    total_packages: doc.data().total_packages,
+    material_url: doc.data().material?.url || doc.data().material_url || "",
+    material_id: doc.data().material?.id || doc.data().material_id || "",
+    material_name: doc.data().material?.name || doc.data().material_name || "",
+    status: MATERIAL_STATUS_MAP[doc.data().status],
+  }));
+  return items;
+}
+
+export async function getMaterials({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
-    const constraints = [orderBy("serial", "asc"), limit(pageSize + 1)];
+    const constraints = [
+      ...buildMaterialFilterConstraints(filters),
+      orderBy("serial", "asc"),
+      limit(pageSize + 1),
+    ];
+
+    console.log("-----constraints -----");
+    console.log(constraints);
+    console.log("-----constraints -----");
+
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
-
     const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
     const querySnapshot = await getDocs(q);
-
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
     const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
-
-    const items = visibleDocs.map((doc) => ({
-      id: doc.id,
-      serial: doc.data().serial,
-      description: doc.data().description,
-      type: TYPE_MATERIAL_MAP[doc.data().type],
-      subject: SUBJECTS_MAP[doc.data().subject],
-      grade: GRADES_MAP[doc.data().grade],
-      total_packages: doc.data().total_packages,
-      material_url: doc.data().material.url,
-      status: MATERIAL_STATUS_MAP[doc.data().status],
-    }));
-
-    const nextLastVisible =
-      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+    const items = parseMaterials(visibleDocs);
+    const nextLastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
     return {
       items,
@@ -144,3 +155,36 @@ export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
   }
 }
 
+function buildMaterialFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "type",
+    "description",
+    "subject",
+    "grade",
+    "status",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const value = filters[field];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
+export async function getMaterialFiltered(filters = {}) {
+  try {
+    const constraints = [ ...buildMaterialFilterConstraints(filters) ];
+    const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
+    const querySnapshot = await getDocs(q);
+    const docs = querySnapshot.docs;
+    const items = parseMaterials(docs);
+    return { items: items };
+
+  } catch (error) {
+    console.error("Error getting materials in material service layer:", error);
+    throw new Error("No fue posible obtener los materiales");
+  }
+}

@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs, where } from "firebase/firestore";
 import { db } from "app/lib/firebase/config";
 import { SUBJECTS_MAP, GRADES_MAP, PACKAGE_STATUS_MAP } from "app/utils/selectOptions";
 
@@ -52,9 +52,35 @@ export async function getPackageLastSerial() {
   }
 }
 
-export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
+function buildPackageFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "title",
+    "description",
+    "subject",
+    "grade",
+    "status",
+    "price",
+    "serial",
+    "active",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const value = filters[field];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
+export async function getPackages({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
-    const constraints = [orderBy("serial", "asc"), limit(pageSize + 1)];
+    const constraints = [
+      ...buildPackageFilterConstraints(filters),
+      orderBy("serial", "asc"),
+      limit(pageSize + 1),
+    ];
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }

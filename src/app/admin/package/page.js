@@ -14,8 +14,8 @@ import { SelectDocs } from "app/components/SelectDocs/SelectDocs";
 import { Drawer } from "app/components/Drawer/Drawer";
 import { sileo, Toaster } from "sileo";
 import { createPackageService, getPackageLastSerial } from "app/services/packageService";
-import { getMaterials } from "app/services/materialService";
-import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS } from "app/utils/selectOptions";
+import { getMaterialFiltered } from "app/services/materialService";
+import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS, GRADES_MAP, SUBJECTS_MAP } from "app/utils/selectOptions";
 
 export default function PackagePage() {
   const router = useRouter();
@@ -25,10 +25,11 @@ export default function PackagePage() {
   const [subject, setSubject] = useState("matematicas");
   const [status, setStatus] = useState("active");
   const [price, setPrice] = useState("");
-  const [documents, setDocuments] = useState([]);
-  const [currentDocuments, setCurrentDocuments] = useState([]);
+  const [currentMaterials, setCurrentMaterials] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 
   const handleCancel = () => {
     setIsEdit(false);
@@ -71,7 +72,7 @@ export default function PackagePage() {
     if (!status) missingFields.push("Estado");
     if (!price) missingFields.push("Precio");
     if (!description.trim()) missingFields.push("Descripción");
-    if (documents.length === 0) missingFields.push("Debe agregar al menos un documento");
+    if (currentMaterials.length === 0) missingFields.push("Debe agregar al menos un material.");
 
     if (missingFields.length > 0) {
       sileo.error({
@@ -82,12 +83,13 @@ export default function PackagePage() {
       return;
     }
 
-    const materials = documents.map((material) => ({
+    const materials = currentMaterials.map((material) => ({
       id: material.id,
       type: material.type,
       description: material.description,
-      document_url: material.document.url,
-      document_id: material.document.id,
+      material_url: material.material_url,
+      material_id: material.material_id,
+      material_name: material.material_name,
     }));
 
     const payload = {
@@ -97,42 +99,40 @@ export default function PackagePage() {
       status: status,
       subject: subject,
       grade: grade,
-      total_documents: documents.length,
+      total_documents: currentMaterials.length,
       materials: materials,
       serial: await getPackageLastSerial(),
     };
-    console.log("-----payload -----");
-    console.log(payload);
-    console.log("-----payload -----");
     await createPackageService(payload);
     sileo.success({
       title: "Paquete creado de forma correcta",
-    }).then(() => {
-      router.push("/admin/packageList");
-    });
+    })
+    router.push("/admin/packageList");
   };
 
-  const handleRemoveDocument = (id) => {
-    setDocuments(documents.filter((document) => document.id !== id));
+  const handleRemoveMaterial = (id) => {
+    setCurrentMaterials(currentMaterials.filter((material) => material.id !== id));
   };
 
-  const handleAddDocument = () => {
-    console.log("Agregar documento");
+  const handleAddMaterial = (material) => {
+    const updateMaterials = [...currentMaterials, material];
+    setCurrentMaterials(updateMaterials);
   };
 
-  const handleSelectDocument = async () => {
-    const documents = await fetchDocuments();
-    setCurrentDocuments(documents);
+  const handleSelectMaterials = async () => {
     setIsDrawerOpen(true);
+    setIsLoadingDocuments(true);
+    const filters = {
+      subject: subject,
+      grade: grade,
+    };
+    const materials = await getMaterialFiltered(filters);
+    setDocumentList(materials.items);
+    setIsLoadingDocuments(false);
   }
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
-  };
-
-  const fetchDocuments = async () => {
-    const documents = await getMaterials();
-    return documents.items;
   };
 
   return (
@@ -164,7 +164,7 @@ export default function PackagePage() {
               />
             </label>
             <label htmlFor="documentsNumber" className={styles.field}>
-              Número de documentos activos: {documents.length}
+              Número de documentos activos: {currentMaterials.length}
             </label>
           </div>
           <div className={styles.columnB}>
@@ -219,18 +219,18 @@ export default function PackagePage() {
         </section>
         <section className={styles.documentsContainer}>
           <div className={styles.documentsContainerTitle}>
-            <h3 className={styles.subtitle}>Documentos del paquete</h3>
+            <h3 className={styles.subtitle}>Materiales del paquete</h3>
             <PrimaryButton
               type="button"
               className={styles.primaryButton}
-              onClick={handleSelectDocument}
+              onClick={handleSelectMaterials}
               >
-              Agregar documento
+              Agregar material
             </PrimaryButton>
           </div>
           <DocPackage
-            documents={documents}
-            onRemove={handleRemoveDocument}
+            materials={currentMaterials}
+            onRemove={handleRemoveMaterial}
           />
         </section>
         <section className={styles.rowBtns}>
@@ -256,10 +256,12 @@ export default function PackagePage() {
         onClose={handleCloseDrawer}
       >
         <SelectDocs
-          documents={currentDocuments}
-          subject={subject}
-          grade={grade}
-          onAddDocument={handleAddDocument}
+          documents={documentList}
+          isLoading={isLoadingDocuments}
+          subject={SUBJECTS_MAP[subject]}
+          grade={GRADES_MAP[grade]}
+          currentMaterials={currentMaterials}
+          onAddMaterial={handleAddMaterial}
         />
       </Drawer>
     </div>
