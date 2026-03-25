@@ -1,0 +1,208 @@
+.container {
+  width: 100%;
+}
+
+.filtersContainer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+  margin-bottom: 18px;
+  border: 1px solid var(--color-primary-light3);
+  border-radius: 8px;
+}
+
+.filtersTitle {
+  width: 100%;
+  color: var(--color-primary-dark2);
+}
+
+.filtersParams {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 5px 0px;
+  border-radius: 10px;
+  color: var(--color-primary-dark2);
+}
+
+.filtersParams label {
+  flex: 1;
+}
+
+.filtersParamsValue {
+  font-weight: 600;
+}
+
+.filtersContent {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field :global(select),
+.field :global(input) {
+  width: 100%;
+}
+
+.filtersContainer > button {
+  flex: 1 1 calc(50% - 6px);
+  margin-top: 6px;
+}
+
+.documentsContainer {
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-primary-light3);
+}
+
+.rowTitle {
+  background-color: var(--color-primary-light2);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  color: var(--color-primary-dark2);
+}
+
+.cellTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.indexCell {
+  display: flex;
+  justify-content: center;
+  flex: 0 0 48px;
+}
+
+.typeCell {
+  display: flex;
+  justify-content: center;
+  flex: 0 0 140px;
+}
+
+.descriptionCell {
+  flex: 0 0 250px;
+  word-break: break-word;
+}
+
+.actionCell {
+  flex: 1 0 60px;
+  justify-content: center;
+}
+
+.mobileLabel {
+  display: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.emptyLabel, .loadingLabel {
+  padding-top: 10px;
+  padding-left: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.iconButton {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.iconButton:hover {
+  background-color: var(--color-primary-light2);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.iconSvg {
+  width: 20px;
+  height: 20px;
+}
+
+.noUrl {
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .filtersParams {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filtersContent {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtersContainer > button {
+    flex: 1 1 100%;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .cell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .indexCell,
+  .typeCell,
+  .descriptionCell,
+  .actionCell {
+    flex: 1 1 auto;
+  }
+
+  .actionCell {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .mobileLabel {
+    display: inline-block;
+  }
+}
+

@@ -2,7 +2,7 @@
 
 import styles from "./dockPackage.module.css";
 
-export function DocPackage({ documents, onRemove }) {
+export function DocPackage({ materials, onRemove }) {
 
   return (
     <div className={styles.container}>
@@ -23,9 +23,9 @@ export function DocPackage({ documents, onRemove }) {
           <span>Remover</span>
         </div>
       </div>
-      {documents.length === 0 ? <div className={styles.emptyLabel}>Paquete sin documentos</div> : null}
-      {documents.map((document, index) => (
-        <div className={styles.row} role="row" key={document.id}>
+      {materials.length === 0 ? <div className={styles.emptyLabel}>Paquete sin materiales</div> : null}
+      {materials.map((material, index) => (
+        <div className={styles.row} role="row" key={material.id}>
           <div className={`${styles.cell} ${styles.indexCell}`} role="cell">
             <span className={styles.mobileLabel}>No</span>
             <span>{index + 1}</span>
@@ -33,24 +33,24 @@ export function DocPackage({ documents, onRemove }) {
 
           <div className={`${styles.cell} ${styles.typeCell}`} role="cell">
             <span className={styles.mobileLabel}>Tipo</span>
-            <span>{document.type}</span>
+            <span>{material.type}</span>
           </div>
 
           <div className={`${styles.cell} ${styles.descriptionCell}`} role="cell">
             <span className={styles.mobileLabel}>Descripcion</span>
-            <span>{document.description}</span>
+            <span>{material.description}</span>
           </div>
 
           <div className={`${styles.cell} ${styles.actionCell}`} role="cell">
             <span className={styles.mobileLabel}>Ver</span>
-            {document.url ? (
+            {material.material_url ? (
               <a
-              href={document.url}
+              href={material.material_url}
               target="_blank"
               rel="noreferrer"
               className={styles.iconButton}
-              aria-label={`Ver documento ${index + 1}`}
-              title="Ver documento"
+              aria-label={`Ver material ${index + 1}`}
+              title="Ver material"
               >
                 <svg viewBox="0 0 24 24" className={styles.iconSvg} aria-hidden="true">
                   <path
@@ -68,10 +68,10 @@ export function DocPackage({ documents, onRemove }) {
             <span className={styles.mobileLabel}>Remover</span>
             <button
               type="button"
-              onClick={() => onRemove(document.id)}
+              onClick={() => onRemove(material.id)}
               className={styles.iconButton}
-              aria-label={`Remover documento ${index + 1}`}
-              title="Remover documento"
+              aria-label={`Remover material ${index + 1}`}
+              title="Remover material"
               >
               <svg viewBox="0 0 24 24" className={styles.iconSvg} aria-hidden="true">
                 <path

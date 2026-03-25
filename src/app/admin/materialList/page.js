@@ -2,12 +2,15 @@
 
 import styles from "./materialList.module.css";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { documentColumns } from "app/utils/tableColumns";
 import { DataTable } from "app/components/ui/DataTable";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { getMaterials } from "app/services/materialService";
 import { filterData, sortData } from "app/utils/tableUtils";
 
 export default function MaterialListPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rows, setRows] = useState([]);
@@ -74,10 +77,22 @@ export default function MaterialListPage() {
     };
   }, [page, pageSize]);
 
+  const handleCreateMaterial = () => {
+    router.push("/admin/material");
+  };
+
   return (
     <div className={styles.page}>
       <section className={styles.card}>
-        <h2>Lista de Documentos</h2>
+        <div className={styles.cardHeader}>
+          <h2>Lista de documentos</h2>
+          <PrimaryButton
+            type="button"
+            onClick={handleCreateMaterial}
+            >
+            Crear material
+          </PrimaryButton>
+        </div>
         {errorMessage ? <p>{errorMessage}</p> : null}
         <DataTable
           columns={documentColumns}

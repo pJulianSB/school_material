@@ -1,31 +1,109 @@
 .page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+}
+
+.card {
+  width: 100%;
+  max-width: 980px;
+  background-color: var(--background);
+  border-radius: 16px;
+  border: 1px solid var(--color-primary-light3);
+  padding: 28px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.title {
+  color: var(--color-primary);
+  line-height: 1.35;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.formGrid {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  color: var(--color-primary-dark2);
+  font-weight: 600;
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.errorList {
+  padding-left: 20px;
+  color: #b91c1c;
+  line-height: 1.35;
+  font-size: 0.92rem;
+}
+
+.successMessage {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    background: radial-gradient(circle at top left, #163861, #020817);
   }
-  
+
   .card {
-    width: 100%;
-    max-width: 420px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 32px 28px;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
-    display: flex;
+    background-color: #020817;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+  }
+
+  .field span {
+    color: var(--foreground);
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 20px 16px;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .formGrid {
     flex-direction: column;
-    gap: 24px;
   }
-  
-  @media (prefers-color-scheme: dark) {
-    .page {
-      background: radial-gradient(circle at top left, #163861, #020817);
-    }
-  
-    .card {
-      background-color: #020817;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
-    }
+
+  .actions {
+    flex-direction: column;
   }
+}
   
   

@@ -6,7 +6,9 @@ export default function AdminLayout({ children }) {
   return (
     <div className={styles.adminLayout}>
       <SideBar routes={adminRoutes} />
-      <main className={styles.adminContent}>{children}</main>
+      <main className={styles.adminContent}>
+        {children}
+      </main>
     </div>
   );
 }
