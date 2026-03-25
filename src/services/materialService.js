@@ -1,6 +1,7 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter } from "firebase/firestore";
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "app/lib/firebase/config";
+import { TYPE_MATERIAL_MAP, SUBJECTS_MAP, GRADES_MAP, MATERIAL_STATUS_MAP } from "app/utils/selectOptions";
 
 const MATERIALS_DOCS_COLLECTION = "documents";
 const MATERIALS_COLLECTION = "material";
@@ -22,7 +23,8 @@ export async function uploadMaterialPdf(file, metadata = {}) {
     }
 
     const safeName = sanitizeFileName(file.name);
-    const uniqueName = `${serverTimestamp()}_${safeName}`;
+    const timestamp = Date.now();
+    const uniqueName = `${timestamp}_${safeName}`;
     const storagePath = `material/${uniqueName}`;
     const storageRef = ref(storage, storagePath);
 
@@ -37,16 +39,16 @@ export async function uploadMaterialPdf(file, metadata = {}) {
       name: file.name,
       url: downloadURL,
       path: storagePath,
-      contentType: file.type || "application/pdf",
+      content_type: file.type || "application/pdf",
       size: file.size || 0,
       metadata,
-      creationDate: serverTimestamp(),
+      creation_date: serverTimestamp(),
       active: true,
     };
 
     const docRef = await addDoc(collection(db, MATERIALS_DOCS_COLLECTION), payload);
 
-    return { id: docRef.id, name: file.name, url: downloadURL };
+    return { id: docRef.id, path: storagePath, url: downloadURL };
   } catch (error) {
     console.error("Error in material service layer:", error);
     throw new Error("No fue posible cargar el documento PDF");
@@ -58,7 +60,13 @@ export async function createMaterialService(payload) {
     if (!payload) {
       throw new Error("No hay información para crear el material");
     }
-    const docRef = await addDoc(collection(db, MATERIALS_COLLECTION), payload);
+
+    const data = {
+      ...payload,
+      creation_date: serverTimestamp(),
+      active: true
+    };
+    const docRef = await addDoc(collection(db, MATERIALS_COLLECTION), data);
     return { id: docRef.id };
 
   } catch (error) {
@@ -96,27 +104,40 @@ export async function getMaterialLastSerial() {
   }
 }
 
+export function parseMaterials(docs) {
+  const items = docs.map((doc) => ({
+    id: doc.id,
+    serial: doc.data().serial,
+    description: doc.data().description,
+    type: TYPE_MATERIAL_MAP[doc.data().type],
+    subject: SUBJECTS_MAP[doc.data().subject],
+    grade: GRADES_MAP[doc.data().grade],
+    total_packages: doc.data().total_packages,
+    material_url: doc.data().material?.url || doc.data().material_url || "",
+    material_id: doc.data().material?.id || doc.data().material_id || "",
+    material_name: doc.data().material?.name || doc.data().material_name || "",
+    status: MATERIAL_STATUS_MAP[doc.data().status],
+  }));
+  return items;
+}
+
 export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
   try {
-    const constraints = [orderBy("serial", "desc"), limit(pageSize + 1)];
+    const constraints = [
+      orderBy("serial", "asc"),
+      limit(pageSize + 1),
+    ];
+
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
-
     const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
     const querySnapshot = await getDocs(q);
-
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
     const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
-
-    const items = visibleDocs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    const nextLastVisible =
-      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+    const items = parseMaterials(visibleDocs);
+    const nextLastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
     return {
       items,
@@ -129,3 +150,36 @@ export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
   }
 }
 
+function buildMaterialFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "type",
+    "description",
+    "subject",
+    "grade",
+    "status",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const value = filters[field];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
+export async function getMaterialFiltered(filters = {}) {
+  try {
+    const constraints = [ ...buildMaterialFilterConstraints(filters) ];
+    const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
+    const querySnapshot = await getDocs(q);
+    const docs = querySnapshot.docs;
+    const items = parseMaterials(docs);
+    return { items: items };
+
+  } catch (error) {
+    console.error("Error getting materials in material service layer:", error);
+    throw new Error("No fue posible obtener los materiales");
+  }
+}

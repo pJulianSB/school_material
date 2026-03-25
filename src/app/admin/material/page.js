@@ -20,27 +20,27 @@ export default function MaterialPage() {
   const [grade, setGrade] = useState("primero");
   const [subject, setSubject] = useState("matematicas");
   const [status, setStatus] = useState("free");
-  const [url, setUrl] = useState("");
-  const [packages, setPackages] = useState("0");
-  const [material, setMaterial] = useState("");
-  const [documentId, setDocumentId] = useState("");
+  const [totalPackages, setTotalPackages] = useState(0);
+  const [material, setMaterial] = useState({});
   const [isEdit, setIsEdit] = useState(false);
 
   const handleUploadMaterial = async (file) => {
-    const { id, url: uploadedUrl } = await uploadMaterialPdf(file, { materialType });
+    const { id, path, url: uploadedUrl } = await uploadMaterialPdf(file, { type: materialType });
 
-    setMaterial(file);
-    setDocumentId(id);
-    setUrl(uploadedUrl);
+    const material = {
+      id: id,
+      name: file.name,
+      path: path,
+      url: uploadedUrl,
+    };
+    setMaterial(material);
     return uploadedUrl;
   };
 
   const handleCancel = () => {
     setIsEdit(false);
-    setMaterial("");
-    setDocumentId("");
-    setUrl("");
-    setPackages("0");
+    setMaterial({});
+    setTotalPackages(0);
     setDescription("");
     setMaterialType("malla");
     setGrade("primero");
@@ -59,7 +59,7 @@ export default function MaterialPage() {
 
   const updateMaterial = () => {
     const payload = {
-      id: documentId,
+      id: material.id,
       materialType: materialType,
       grade: grade,
     };
@@ -74,7 +74,7 @@ export default function MaterialPage() {
     if (!status) missingFields.push("Estado");
     if (!description.trim()) missingFields.push("Descripción");
     if (!material || !material.name) missingFields.push("Seleccionar documento PDF");
-    if (!url) missingFields.push("Guardar documento PDF");
+    if (!material.url) missingFields.push("Guardar documento PDF");
 
     if (missingFields.length > 0) {
       sileo.error({
@@ -87,23 +87,22 @@ export default function MaterialPage() {
 
     const payload = {
       type: materialType,
-      grade: grade,
-      subject: subject,
-      status: status,
       description: description,
-      packages: packages,
-      material_url: url,
+      status: status,
+      subject: subject,
+      grade: grade,
+      total_packages:totalPackages,
+      material: {
+        id: material.id,
+        name: material.name,
+        url: material.url,
+        path: material.path,
+      },
       serial: await getMaterialLastSerial(),
       active: true
     };
-    console.log("-----payload -----");
-    console.log(payload);
-    console.log("-----payload -----");
+
     await createMaterialService(payload);
-    setIsEdit(false);
-    sileo.success({
-      title: "Material creado de forma correcta",
-    });
     router.push("/admin/materialList");
   };
 
@@ -174,14 +173,14 @@ export default function MaterialPage() {
               />
             </label>
             <label htmlFor="packagesNumber" className={styles.field}>
-              Número de paquetes: {packages}
+              Número de paquetes: {totalPackages}
             </label>
           </div>
         </section>
         <section className={styles.documentContainer}>
           <LoadMaterial
             material= {material}
-            existingDocumentUrl={url}
+            existingDocumentUrl={material.url}
             onUpload={handleUploadMaterial}
           />
         </section>

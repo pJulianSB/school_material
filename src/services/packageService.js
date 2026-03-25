@@ -1,20 +1,22 @@
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs, where } from "firebase/firestore";
 import { db } from "app/lib/firebase/config";
+import { SUBJECTS_MAP, GRADES_MAP, PACKAGE_STATUS_MAP } from "app/utils/selectOptions";
 
 const PACKAGE_COLLECTION = "packages";
 
 export const createPackageService = async (packageData) => {
   try {
-    const packagesRef = collection(db, PACKAGE_COLLECTION);
-    const payload = {
+    if (!packageData) {
+      throw new Error("No hay información para crear el paquete");
+    }
+
+    const data = {
       ...packageData,
-      creationDate: serverTimestamp(),
+      creation_date: serverTimestamp(),
       active: true
     };
-
-    const docRef = await addDoc(pa, payload);
-    return docRef.id;
-
+    const docRef = await addDoc(collection(db, PACKAGE_COLLECTION), data);
+    return { id: docRef.id };
   } catch (error) {
     console.error("Error in package service layer:", error);
     throw new Error("It was not possible to create the package");
@@ -50,9 +52,34 @@ export async function getPackageLastSerial() {
   }
 }
 
+function buildPackageFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "title",
+    "description",
+    "subject",
+    "grade",
+    "status",
+    "price",
+    "serial",
+    "active",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const value = filters[field];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
 export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
   try {
-    const constraints = [orderBy("serial", "desc"), limit(pageSize + 1)];
+    const constraints = [
+      orderBy("serial", "asc"),
+      limit(pageSize + 1),
+    ];
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
@@ -66,7 +93,15 @@ export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
 
     const items = visibleDocs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
+      serial: doc.data().serial,
+      date: doc.data().creation_date.toDate().toLocaleDateString(),
+      title: doc.data().title,
+      description: doc.data().description,
+      subject: SUBJECTS_MAP[doc.data().subject],
+      grade: GRADES_MAP[doc.data().grade],
+      status: PACKAGE_STATUS_MAP[doc.data().status],
+      price: doc.data().price,
+      total_documents: doc.data().total_documents,
     }));
 
     const nextLastVisible =

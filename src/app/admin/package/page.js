@@ -10,11 +10,14 @@ import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { MissingFields } from "app/components/ui/MissingFields";
 import { DocPackage } from "app/components/DocPackage/DocPackage";
+import { SelectDocs } from "app/components/SelectDocs/SelectDocs";
+import { Drawer } from "app/components/Drawer/Drawer";
 import { sileo, Toaster } from "sileo";
 import { createPackageService, getPackageLastSerial } from "app/services/packageService";
-import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS } from "app/utils/selectOptions";
+import { getMaterialFiltered } from "app/services/materialService";
+import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS, GRADES_MAP, SUBJECTS_MAP } from "app/utils/selectOptions";
 
-export default function MaterialPage() {
+export default function PackagePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -22,13 +25,11 @@ export default function MaterialPage() {
   const [subject, setSubject] = useState("matematicas");
   const [status, setStatus] = useState("active");
   const [price, setPrice] = useState("");
-  const [documents, setDocuments] = useState([
-    {id: 1, type: "Malla", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor ullamcorper erat volutpat fringilla.", url: "google.com"},
-    {id: 2, type: "Malla", description: "some text", url: "google.com"},
-    {id: 3, type: "Malla", description: "some text", url: "google.com"},
-    {id: 4, type: "Malla", description: "Curabitur viverra imperdiet dui, eu tincidunt nisl ultricies vitae. Aliquam fermentum purus vitae enim dapibus facilisis.", url: "google.com"},
-  ]);
+  const [currentMaterials, setCurrentMaterials] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 
   const handleCancel = () => {
     setIsEdit(false);
@@ -69,7 +70,9 @@ export default function MaterialPage() {
     if (!grade) missingFields.push("Grado");
     if (!subject) missingFields.push("Área");
     if (!status) missingFields.push("Estado");
+    if (!price) missingFields.push("Precio");
     if (!description.trim()) missingFields.push("Descripción");
+    if (currentMaterials.length === 0) missingFields.push("Debe agregar al menos un material.");
 
     if (missingFields.length > 0) {
       sileo.error({
@@ -80,36 +83,54 @@ export default function MaterialPage() {
       return;
     }
 
+    const materials = currentMaterials.map((material) => ({
+      id: material.id,
+      type: material.type,
+      description: material.description,
+      material_url: material.material_url,
+      material_id: material.material_id,
+      material_name: material.material_name,
+    }));
+
     const payload = {
       title: title,
-      description: description,
-      grade: grade,
-      subject: subject,
-      status: status,
       price: price,
-      documents: documents,
+      description: description,
+      status: status,
+      subject: subject,
+      grade: grade,
+      total_documents: currentMaterials.length,
+      materials: materials,
       serial: await getPackageLastSerial(),
-      active: true
     };
-    console.log("-----payload -----");
-    console.log(payload);
-    console.log("-----payload -----");
     await createPackageService(payload);
-    setIsEdit(false);
-    sileo.success({
-      title: "Paquete creado de forma correcta",
-    }).then(() => {
-      router.push("/admin/packageList");
-    });
+    router.push("/admin/packageList");
   };
 
-  const handleRemoveDocument = (id) => {
-    setDocuments(documents.filter((document) => document.id !== id));
+  const handleRemoveMaterial = (id) => {
+    setCurrentMaterials(currentMaterials.filter((material) => material.id !== id));
   };
 
-  const handleAddDocument = () => {
-    //open modal to add document
+  const handleAddMaterial = (material) => {
+    const updateMaterials = [...currentMaterials, material];
+    setCurrentMaterials(updateMaterials);
+  };
+
+  const handleSelectMaterials = async () => {
+    setIsDrawerOpen(true);
+    setIsLoadingDocuments(true);
+    const filters = {
+      subject: subject,
+      grade: grade,
+    };
+    const materials = await getMaterialFiltered(filters);
+    setDocumentList(materials.items);
+    setIsLoadingDocuments(false);
   }
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+  };
 
   return (
     <div className={styles.page}>
@@ -140,7 +161,7 @@ export default function MaterialPage() {
               />
             </label>
             <label htmlFor="documentsNumber" className={styles.field}>
-              Número de documentos activos: {documents.length}
+              Número de documentos activos: {currentMaterials.length}
             </label>
           </div>
           <div className={styles.columnB}>
@@ -195,18 +216,18 @@ export default function MaterialPage() {
         </section>
         <section className={styles.documentsContainer}>
           <div className={styles.documentsContainerTitle}>
-            <h3 className={styles.subtitle}>Documentos del paquete</h3>
+            <h3 className={styles.subtitle}>Materiales del paquete</h3>
             <PrimaryButton
               type="button"
               className={styles.primaryButton}
-              onClick={handleAddDocument}
+              onClick={handleSelectMaterials}
               >
-              Agregar documento
+              Agregar material
             </PrimaryButton>
           </div>
           <DocPackage
-            documents={documents}
-            onRemove={handleRemoveDocument}
+            materials={currentMaterials}
+            onRemove={handleRemoveMaterial}
           />
         </section>
         <section className={styles.rowBtns}>
@@ -226,6 +247,20 @@ export default function MaterialPage() {
           </TertiaryButton>
         </section>
       </section>
+      <Drawer
+        isOpen={isDrawerOpen}
+        title="Agregar documentos al paquete"
+        onClose={handleCloseDrawer}
+      >
+        <SelectDocs
+          documents={documentList}
+          isLoading={isLoadingDocuments}
+          subject={SUBJECTS_MAP[subject]}
+          grade={GRADES_MAP[grade]}
+          currentMaterials={currentMaterials}
+          onAddMaterial={handleAddMaterial}
+        />
+      </Drawer>
     </div>
   );
 }
