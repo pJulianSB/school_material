@@ -103,11 +103,7 @@ export default function MaterialPage() {
     };
 
     await createMaterialService(payload);
-    sileo.success({
-      title: "Material creado de forma correcta",
-    }).then(() => {
-      router.push("/admin/materialList");
-    });
+    router.push("/admin/materialList");
   };
 
   return (

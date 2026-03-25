@@ -104,9 +104,6 @@ export default function PackagePage() {
       serial: await getPackageLastSerial(),
     };
     await createPackageService(payload);
-    sileo.success({
-      title: "Paquete creado de forma correcta",
-    })
     router.push("/admin/packageList");
   };
 

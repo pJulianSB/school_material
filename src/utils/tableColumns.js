@@ -39,15 +39,16 @@ export const documentColumns = [
 ];
 
 export const billingColumns = [
-  { id: "id", header: "No", field: "id", sortable: true, width: "60px" },
-  { id: "date", header: "Fecha", field: "date", sortable: true, filter: true },
-  { id: "package", header: "Paquete", field: "package", sortable: true, filter: true },
-  { id: "ticketId", header: "TicketId", field: "ticketId", sortable: true, filter: true },
+  { id: "serial", header: "No", field: "serial", sortable: true, width: "60px" },
+  { id: "date_purchase", header: "Fecha", field: "date_purchase", sortable: true, filter: true },
+  { id: "total_packages", header: "No. Paquetes", field: "total_packages", sortable: true },
+  { id: "ticket_id", header: "TicketId", field: "ticket_id", sortable: true, filter: true },
   { id: "name", header: "Nombres", field: "name", sortable: true, filter: true },
   { id: "lastname", header: "Apellidos", field: "lastname", sortable: true, filter: true },
   { id: "email", header: "Correo", field: "email", sortable: true, filter: true },
+  { id: "phone", header: "Teléfono", field: "phone", sortable: false, filter: true },
   { id: "status", header: "Estado", field: "status", sortable: true, filter: true },
-  { id: "support", header: "Soporte", field: "support", sortable: false },
-  { id: "value", header: "Valor", field: "value", sortable: false },
-  { id: "notes", header: "Descripción", field: "notes", sortable: false, filter: true },
+  { id: "invoice_url", header: "Factura", field: "invoice_url", sortable: false },
+  { id: "total_cost", header: "Costo", field: "total_cost", sortable: false },
+  { id: "notes", header: "Notas", field: "notes", sortable: false, filter: true },
 ];

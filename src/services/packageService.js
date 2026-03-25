@@ -74,10 +74,9 @@ function buildPackageFilterConstraints(filters = {}) {
   return constraints;
 }
 
-export async function getPackages({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
+export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
   try {
     const constraints = [
-      ...buildPackageFilterConstraints(filters),
       orderBy("serial", "asc"),
       limit(pageSize + 1),
     ];

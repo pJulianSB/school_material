@@ -1,0 +1,27 @@
+.checkboxWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  color: var(--color-primary-dark2);
+  line-height: 1.35;
+  font-size: 0.95rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .checkboxLabel {
+    color: var(--foreground);
+  }
+}
+

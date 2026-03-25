@@ -121,17 +121,12 @@ export function parseMaterials(docs) {
   return items;
 }
 
-export async function getMaterials({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
+export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
   try {
     const constraints = [
-      ...buildMaterialFilterConstraints(filters),
       orderBy("serial", "asc"),
       limit(pageSize + 1),
     ];
-
-    console.log("-----constraints -----");
-    console.log(constraints);
-    console.log("-----constraints -----");
 
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
