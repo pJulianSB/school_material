@@ -6,6 +6,7 @@ import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { Input } from "app/components/ui/Input";
 import { Select } from "app/components/ui/Select";
+import { SeeIcon } from "app/components/icons/SeeIcon";
 import { TYPE_MATERIAL_OPTIONS, TYPE_MATERIAL_MAP } from "app/utils/selectOptions";
 import { getAvailableMaterials } from "app/utils/filterFunctions";
 
@@ -110,21 +111,11 @@ export function SelectDocs({ documents, isLoading, subject, grade, currentMateri
               <div className={`${styles.cell} ${styles.actionCell}`} role="cell">
                 <span className={styles.mobileLabel}>Ver</span>
                 {material.material_url ? (
-                  <a
-                  href={material.material_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.iconButton}
-                  aria-label={`Ver material ${index + 1}`}
-                  title="Ver material"
-                  >
-                    <svg viewBox="0 0 24 24" className={styles.iconSvg} aria-hidden="true">
-                      <path
-                        d="M12 5C6.5 5 2.1 8.4 1 12c1.1 3.6 5.5 7 11 7s9.9-3.4 11-7c-1.1-3.6-5.5-7-11-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z"
-                        fill="currentColor"
-                        />
-                    </svg>
-                  </a>
+                  <SeeIcon
+                    url={material.material_url}
+                    elementLabel="Material"
+                    serial={index + 1}
+                  />
                 ) : (
                   <span className={styles.noUrl}>-</span>
                 )}

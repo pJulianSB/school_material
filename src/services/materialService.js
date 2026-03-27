@@ -1,4 +1,15 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, startAfter, where } from "firebase/firestore";
+import {
+  addDoc, 
+  collection, 
+  getDocs, 
+  getCountFromServer, 
+  limit, 
+  orderBy, 
+  query, 
+  serverTimestamp, 
+  startAfter, 
+  where 
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "app/lib/firebase/config";
 import { TYPE_MATERIAL_MAP, SUBJECTS_MAP, GRADES_MAP, MATERIAL_STATUS_MAP } from "app/utils/selectOptions";
@@ -121,17 +132,24 @@ export function parseMaterials(docs) {
   return items;
 }
 
-export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
+export async function getMaterials({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
     const constraints = [
+      ...buildMaterialFilterConstraints(filters),
       orderBy("serial", "asc"),
-      limit(pageSize + 1),
     ];
 
+    const qTotal = query(collection(db, MATERIALS_COLLECTION), ...constraints);
+    const snapshot = await getCountFromServer(qTotal);
+    const totalItems = snapshot.data().count;
+
+    constraints.push(limit(pageSize + 1),);
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
+
     const q = query(collection(db, MATERIALS_COLLECTION), ...constraints);
+    
     const querySnapshot = await getDocs(q);
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
@@ -143,6 +161,7 @@ export async function getMaterials({ pageSize = 10, lastVisible = null } = {}) {
       items,
       lastVisible: nextLastVisible,
       hasMore,
+      totalItems,
     };
   } catch (error) {
     console.error("Error getting materials in material service layer:", error);

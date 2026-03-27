@@ -2,7 +2,6 @@
 
 import React from "react";
 import styles from "./DataTable.module.css";
-import { PrimaryButton } from "app/components/ui/PrimaryButton";
 
 export function DataTable({
   columns = [],
@@ -12,20 +11,11 @@ export function DataTable({
   totalItems = 0,
   pageSizeOptions = [10, 15, 20],
   sortBy = null,
-  filters = null,
   onSortChange,
   onPageChange,
   onPageSizeChange,
-  onFilterChange,
-  renderFilterCell,
-  actionButtonLabel,
-  onActionClick,
   className,
 }) {
-   const hasFiltersRow = Boolean(
-    (filters != null && onFilterChange) && columns.some((c) => c.filter)
-  );
- 
    const totalPages =
      pageSize > 0 ? Math.max(1, Math.ceil(totalItems / pageSize || 1)) : 1;
    const currentPage = Math.min(Math.max(page, 1), totalPages);
@@ -76,47 +66,34 @@ export function DataTable({
      }
    };
  
-   const handleFilterChange = (columnId, value) => {
-     if (!onFilterChange) return;
-     const nextFilters = {
-       ...(filters || {}),
-       [columnId]: value,
-     };
-     onFilterChange(nextFilters);
-   };
- 
    const tableClassName = [styles.table, className]
      .filter(Boolean)
      .join(" ");
+
+  const getCellValue = (column, row) => {
+    if (typeof column.accessor === "function") {
+      return column.accessor(row);
+    }
+    if (column.field) {
+      return row[column.field];
+    }
+    return row[column.id];
+  };
+
+  const getCellContent = (column, row, rowIndex) => {
+    if (typeof column.renderCell === "function") {
+      return column.renderCell(row, { rowIndex, column });
+    }
+
+    const value = getCellValue(column, row);
+    return value != null ? String(value) : "";
+  };
  
    return (
      <div className={styles.tableWrapper}>
        <table className={tableClassName}>
          <thead>
-          {hasFiltersRow && (
-            <tr className={styles.filtersRow}>
-              {columns.map((column) => (
-                <th key={column.id} className={styles.headerCell}>
-                  {column.type === "button" ? null : column.filter ? (
-                    renderFilterCell ? (
-                      renderFilterCell(column, filters || {}, onFilterChange)
-                    ) : (
-                      <input
-                        type="text"
-                        className={styles.filterInput}
-                        value={filters?.[column.id] ?? ""}
-                        onChange={(e) =>
-                          handleFilterChange(column.id, e.target.value)
-                        }
-                        placeholder={`Filtrar ${column.header}`}
-                      />
-                    )
-                  ) : null}
-                </th>
-              ))}
-            </tr>
-          )}
-           <tr className={styles.headerRow}>
+          <tr className={styles.headerRow}>
              {columns.map((column) => {
                const isButtonColumn = column.type === "button";
                const isSortable = Boolean(
@@ -169,41 +146,16 @@ export function DataTable({
              data.map((row, rowIndex) => (
                <tr key={row.id ?? rowIndex} className={styles.bodyRow}>
                  {columns.map((column) => {
-                   if (
-                     column.type === "button" &&
-                     actionButtonLabel &&
-                     onActionClick
-                   ) {
-                     const rowId = row.id ?? rowIndex;
-                     return (
-                       <td
-                         key={column.id}
-                         className={`${styles.cell} ${styles.cellButton}`}
-                       >
-                         <PrimaryButton
-                           type="button"
-                           className={styles.actionButton}
-                           onClick={() => onActionClick(rowId)}
-                         >
-                           {actionButtonLabel}
-                         </PrimaryButton>
-                       </td>
-                     );
-                   }
-
-                   let value;
-                   if (typeof column.accessor === "function") {
-                     value = column.accessor(row);
-                   } else if (column.field) {
-                     value = row[column.field];
-                   } else {
-                     value = row[column.id];
-                   }
+                  const isButtonColumn = column.type === "button";
+                  const cellClassName = isButtonColumn
+                    ? `${styles.cell} ${styles.cellButton}`
+                    : styles.cell;
+                  const cellContent = getCellContent(column, row, rowIndex);
 
                    return (
-                     <td key={column.id} className={styles.cell}>
-                       {value != null ? String(value) : ""}
-                     </td>
+                    <td key={column.id} className={cellClassName}>
+                      {cellContent}
+                    </td>
                    );
                  })}
                </tr>
