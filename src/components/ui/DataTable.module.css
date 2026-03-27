@@ -1,6 +1,5 @@
  .tableWrapper {
    width: 100%;
-   overflow-x: auto;
  }
  
  .table {
@@ -8,6 +7,8 @@
    border-collapse: collapse;
    border-spacing: 0;
    font-size: 0.9rem;
+   overflow-x: auto;
+   table-layout: auto;
  }
  
  .headerRow {
@@ -48,12 +49,15 @@
  }
  
 .cell {
+  max-width: 300px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   padding: 8px 12px;
   border-bottom: 1px solid var(--color-primary-light2);
 }
 
 .cellButton {
-  vertical-align: middle;
+  text-align: center;
 }
 
 .actionButton {
@@ -63,19 +67,6 @@
  .emptyRow .cell {
    text-align: center;
    font-style: italic;
- }
- 
- .filtersRow .cell {
-   padding-top: 4px;
-   padding-bottom: 8px;
- }
- 
- .filterInput {
-   width: 100%;
-   padding: 4px 8px;
-   border-radius: 6px;
-   border: 1px solid var(--input-border);
-   font-size: 0.85rem;
  }
  
  .pagination {

@@ -1,4 +1,15 @@
-import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  limit, 
+  orderBy, 
+  query, 
+  startAfter, 
+  getDocs, 
+  where, 
+  getCountFromServer 
+} from "firebase/firestore";
 import { db } from "app/lib/firebase/config";
 
 const USER_COLLECTION = "users";
@@ -8,7 +19,8 @@ export const createUserService = async (userData) => {
     const usersRef = collection(db, USER_COLLECTION);
     const payload = {
       ...userData,
-      creationDate: serverTimestamp(),
+      date_created: serverTimestamp(),
+      active: true,
     };
 
     const docRef = await addDoc(usersRef, payload);
@@ -49,9 +61,57 @@ export async function getUserLastSerial() {
   }
 }
 
-export async function getUsers({ pageSize = 10, lastVisible = null } = {}) {
+export function buildUserFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "name",
+    "lastname",
+    "cellphone",
+    "email",
+    "school",
+    "city",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const value = filters[field];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
+export function parseUsers(docs) {
+  const items = docs.map((doc) => ({
+    id: doc.id,
+    serial: doc.data().serial,
+    date: doc.data().date_created.toDate().toLocaleDateString(),
+    name: doc.data().name,
+    lastname: doc.data().lastname,
+    phone: doc.data().cellphone,
+    email: doc.data().email,
+    school: doc.data().school,
+    city: doc.data().city,
+    province: doc.data().province,
+    sales: doc.data().sales_qty,
+    totalSales: doc.data().sales_total,
+    active: doc.data().active,
+  }));
+  return items;
+}
+
+export async function getUsers({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
-    const constraints = [orderBy("serial", "asc"), limit(pageSize + 1)];
+    const constraints = [
+      ...buildUserFilterConstraints(filters),
+      orderBy("serial", "asc"),
+    ];
+
+    const qTotal = query(collection(db, USER_COLLECTION), ...constraints);
+    const snapshot = await getCountFromServer(qTotal);
+    const totalItems = snapshot.data().count;
+
+    constraints.push(limit(pageSize + 1),);
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
@@ -62,30 +122,14 @@ export async function getUsers({ pageSize = 10, lastVisible = null } = {}) {
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
     const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
-
-    const items = visibleDocs.map((doc) => ({
-      id: doc.id,
-      serial: doc.data().serial,
-      date: doc.data().date_created.toDate().toLocaleDateString(),
-      name: doc.data().name,
-      lastname: doc.data().lastname,
-      phone: doc.data().cellphone,
-      email: doc.data().email,
-      school: doc.data().school,
-      city: doc.data().city,
-      province: doc.data().province,
-      sales: doc.data().sales_qty,
-      totalSales: doc.data().sales_total,
-      active: doc.data().active,
-    }));
-
-    const nextLastVisible =
-      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+    const items = parseUsers(visibleDocs);
+    const nextLastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
     return {
       items,
       lastVisible: nextLastVisible,
       hasMore,
+      totalItems,
     };
   } catch (error) {
     console.error("Error getting packages in package service layer:", error);

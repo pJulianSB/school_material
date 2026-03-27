@@ -1,4 +1,15 @@
-import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs, where } from "firebase/firestore";
+import {
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  limit, 
+  orderBy, 
+  query, 
+  startAfter, 
+  getDocs, 
+  where, 
+  getCountFromServer 
+} from "firebase/firestore";
 import { db } from "app/lib/firebase/config";
 import { SUBJECTS_MAP, GRADES_MAP, PACKAGE_STATUS_MAP } from "app/utils/selectOptions";
 
@@ -74,43 +85,52 @@ function buildPackageFilterConstraints(filters = {}) {
   return constraints;
 }
 
-export async function getPackages({ pageSize = 10, lastVisible = null } = {}) {
+export function parsePackages(docs) {
+  const items = docs.map((doc) => ({
+    id: doc.id,
+    serial: doc.data().serial,
+    date: doc.data().creation_date.toDate().toLocaleDateString(),
+    title: doc.data().title,
+    description: doc.data().description,
+    subject: SUBJECTS_MAP[doc.data().subject],
+    grade: GRADES_MAP[doc.data().grade],
+    status: PACKAGE_STATUS_MAP[doc.data().status],
+    price: doc.data().price,
+    total_documents: doc.data().total_documents,
+  }));
+  return items;
+}
+
+export async function getPackages({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
     const constraints = [
+      ...buildPackageFilterConstraints(filters),
       orderBy("serial", "asc"),
-      limit(pageSize + 1),
     ];
+
+    const qTotal = query(collection(db, PACKAGE_COLLECTION), ...constraints);
+    const snapshot = await getCountFromServer(qTotal);
+    const totalItems = snapshot.data().count;
+
+    constraints.push(limit(pageSize + 1),);
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
 
     const q = query(collection(db, PACKAGE_COLLECTION), ...constraints);
-    const querySnapshot = await getDocs(q);
 
+    const querySnapshot = await getDocs(q);
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
     const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
-
-    const items = visibleDocs.map((doc) => ({
-      id: doc.id,
-      serial: doc.data().serial,
-      date: doc.data().creation_date.toDate().toLocaleDateString(),
-      title: doc.data().title,
-      description: doc.data().description,
-      subject: SUBJECTS_MAP[doc.data().subject],
-      grade: GRADES_MAP[doc.data().grade],
-      status: PACKAGE_STATUS_MAP[doc.data().status],
-      price: doc.data().price,
-      total_documents: doc.data().total_documents,
-    }));
-
-    const nextLastVisible =
-      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+    const items = parsePackages(visibleDocs);
+    const nextLastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
     return {
       items,
       lastVisible: nextLastVisible,
       hasMore,
+      totalItems,
     };
   } catch (error) {
     console.error("Error getting packages in package service layer:", error);
