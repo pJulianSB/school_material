@@ -3,38 +3,28 @@
 import styles from "./admin.module.css";
 import { useEffect, useRef, useState } from "react";
 import { billingColumns } from "app/utils/tableColumns";
-import { filterData, sortData } from "app/utils/tableUtils";
+import { sortData } from "app/utils/tableUtils";
 import { DataTable } from "app/components/ui/DataTable";
-import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { getBilling } from "app/services/billingService";
+import BillingFilter from "app/components/BillingFilter/BillingFilter";
 
 export default function BillingListPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rows, setRows] = useState([]);
   const [sortBy, setSortBy] = useState(null);
-  const [filters, setFilters] = useState({});
   const [totalItems, setTotalItems] = useState(0);
   const pageCursorsRef = useRef({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [activeFilters, setActiveFilters] = useState(null);
 
-  const filterableColumns = new Set(
-    billingColumns.filter((col) => col.filter).map((col) => col.id)
-  );
   const sortableColumns = new Set(
     billingColumns.filter((col) => col.sortable).map((col) => col.id)
   );
-
-  const safeFilters = Object.fromEntries(
-    Object.entries(filters).filter(([key, value]) => {
-      return filterableColumns.has(key) && String(value ?? "").trim() !== "";
-    })
-  );
-  const safeSortBy =
-    sortBy && sortableColumns.has(sortBy.columnId) ? sortBy : null;
-  const filteredRows = filterData(rows, safeFilters);
-  const tableRows = sortData(filteredRows, safeSortBy);
+  const safeSortBy = sortBy && sortableColumns.has(sortBy.columnId) ? sortBy : null;
+  const sortedRows = sortData(rows, safeSortBy);
+  const tableRows = safeSortBy ? rows : sortedRows;
 
   useEffect(() => {
     let isMounted = true;
@@ -45,18 +35,17 @@ export default function BillingListPage() {
 
       try {
         const previousCursor = page > 1 ? pageCursorsRef.current[page - 1] : null;
-        const { items, lastVisible, hasMore } = await getBilling({
+        const { items, lastVisible, totalItems } = await getBilling({
           pageSize,
           lastVisible: previousCursor || null,
+          filters: activeFilters || {},
         });
 
         if (!isMounted) return;
 
         setRows(items);
+        setTotalItems(totalItems);
         pageCursorsRef.current[page] = lastVisible;
-
-        const loadedCount = (page - 1) * pageSize + items.length;
-        setTotalItems(hasMore ? loadedCount + 1 : loadedCount);
       } catch (error) {
         if (!isMounted) return;
         setRows([]);
@@ -72,11 +61,24 @@ export default function BillingListPage() {
     return () => {
       isMounted = false;
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, activeFilters]);
 
-  const handleCreateBilling = () => {
-    console.log("Crear factura");
-  }
+  const handleApplyFilters = (filters) => {
+    setErrorMessage("");
+    setPage(1);
+    pageCursorsRef.current = {};
+    console.log("filters !!!");
+    console.log(filters);
+    console.log("filters !!!");
+    setActiveFilters(filters);
+  };
+
+  const handleClearFilters = () => {
+    setActiveFilters(null);
+    setSortBy(null);
+    setPage(1);
+    pageCursorsRef.current = {};
+  };
 
   return (
     <div className={styles.page}>
@@ -84,6 +86,10 @@ export default function BillingListPage() {
         <div className={styles.cardHeader}>
           <h2>Lista de facturas</h2>
         </div>
+        <BillingFilter
+          onApplyFilters={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+        />
         {errorMessage ? <p>{errorMessage}</p> : null}
         <DataTable
           columns={billingColumns}
@@ -91,15 +97,9 @@ export default function BillingListPage() {
           page={page}
           pageSize={pageSize}
           totalItems={totalItems}
-          sortBy={sortBy}
-          filters={filters}
+          sortBy={safeSortBy}
           onSortChange={(nextSort) => {
             setSortBy(nextSort);
-            setPage(1);
-            pageCursorsRef.current = {};
-          }}
-          onFilterChange={(nextFilters) => {
-            setFilters(nextFilters);
             setPage(1);
             pageCursorsRef.current = {};
           }}

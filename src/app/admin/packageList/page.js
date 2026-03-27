@@ -4,39 +4,30 @@ import styles from "./packageList.module.css";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { packageColumns } from "app/utils/tableColumns";
-import { filterData, sortData } from "app/utils/tableUtils";
+import { sortData } from "app/utils/tableUtils";
 import { DataTable } from "app/components/ui/DataTable";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
+import PackageFilter from "./PackageFilter";
 import { getPackages } from "app/services/packageService";
 
 export default function PackageListPage() {
   const router = useRouter();
+  const pageCursorsRef = useRef({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [rows, setRows] = useState([]);
+  const [activeFilters, setActiveFilters] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const [filters, setFilters] = useState({});
   const [totalItems, setTotalItems] = useState(0);
-  const pageCursorsRef = useRef({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const filterableColumns = new Set(
-    packageColumns.filter((col) => col.filter).map((col) => col.id)
-  );
   const sortableColumns = new Set(
     packageColumns.filter((col) => col.sortable).map((col) => col.id)
   );
-
-  const safeFilters = Object.fromEntries(
-    Object.entries(filters).filter(([key, value]) => {
-      return filterableColumns.has(key) && String(value ?? "").trim() !== "";
-    })
-  );
-  const safeSortBy =
-    sortBy && sortableColumns.has(sortBy.columnId) ? sortBy : null;
-  const filteredRows = filterData(rows, safeFilters);
-  const tableRows = sortData(filteredRows, safeSortBy);
+  const safeSortBy = sortBy && sortableColumns.has(sortBy.columnId) ? sortBy : null;
+  const sortedRows = sortData(rows, safeSortBy);
+  const tableRows = safeSortBy ? rows : sortedRows;
 
   useEffect(() => {
     let isMounted = true;
@@ -47,19 +38,18 @@ export default function PackageListPage() {
 
       try {
         const previousCursor = page > 1 ? pageCursorsRef.current[page - 1] : null;
-        const { items, lastVisible, hasMore } = await getPackages({
+        const { items, lastVisible, totalItems } = await getPackages({
           pageSize,
           lastVisible: previousCursor || null,
+          filters: activeFilters || {},
         });
 
         if (!isMounted) return;
 
         setRows(items);
+        setTotalItems(totalItems);
         pageCursorsRef.current[page] = lastVisible;
 
-        const loadedCount = (page - 1) * pageSize + items.length;
-        // Con hasMore en true dejamos la siguiente página habilitada.
-        setTotalItems(hasMore ? loadedCount + 1 : loadedCount);
       } catch (error) {
         if (!isMounted) return;
         setRows([]);
@@ -75,10 +65,24 @@ export default function PackageListPage() {
     return () => {
       isMounted = false;
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, activeFilters]);
 
   const handleCreatePackage = () => {
     router.push("/admin/package");
+  };
+
+  const handleApplyFilters = (filters) => {
+    setErrorMessage("");
+    setPage(1);
+    pageCursorsRef.current = {};
+    setActiveFilters(filters);
+  };
+
+  const handleClearFilters = () => {
+    setActiveFilters(null);
+    setSortBy(null);
+    setPage(1);
+    pageCursorsRef.current = {};
   };
 
   return (
@@ -93,6 +97,10 @@ export default function PackageListPage() {
             Crear paquete
           </PrimaryButton>
         </div>
+        <PackageFilter
+          onApplyFilters={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+        />
         {errorMessage ? <p>{errorMessage}</p> : null}
         <DataTable
           columns={packageColumns}
@@ -100,15 +108,9 @@ export default function PackageListPage() {
           page={page}
           pageSize={pageSize}
           totalItems={totalItems}
-          sortBy={sortBy}
-          filters={filters}
+          sortBy={safeSortBy}
           onSortChange={(nextSort) => {
             setSortBy(nextSort);
-            setPage(1);
-            pageCursorsRef.current = {};
-          }}
-          onFilterChange={(nextFilters) => {
-            setFilters(nextFilters);
             setPage(1);
             pageCursorsRef.current = {};
           }}
@@ -117,6 +119,10 @@ export default function PackageListPage() {
             setPageSize(size);
             setPage(1);
             pageCursorsRef.current = {};
+          }}
+          actionButtonLabel="Editar"
+          onActionClick={(rowId) => {
+            console.log("rowId", rowId);
           }}
         />
         {isLoading ? <p>Cargando paquetes...</p> : null}

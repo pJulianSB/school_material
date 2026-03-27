@@ -1,6 +1,17 @@
-import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs, where } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc,  
+  serverTimestamp, 
+  limit, 
+  orderBy, 
+  query, 
+  startAfter, 
+  getDocs, 
+  where,
+  getCountFromServer 
+} from "firebase/firestore";
 import { db } from "app/lib/firebase/config";
-import { SUBJECTS_MAP, GRADES_MAP, PACKAGE_STATUS_MAP } from "app/utils/selectOptions";
+import { BILLING_STATUS_MAP } from "app/utils/selectOptions";
 
 const BILLING_COLLECTION = "billing";
 
@@ -58,7 +69,7 @@ export function parseBilling(invoices) {
     serial: doc.data().serial,
     date_purchase: doc.data().date_purchase.toDate().toLocaleDateString(),
     ticket_id: doc.data().ticket_id,
-    status: doc.data().status,
+    status: BILLING_STATUS_MAP[doc.data().status],
     notes: doc.data().notes,
     total_cost: doc.data().total_cost,
     total_packages: doc.data().total_packages,
@@ -75,29 +86,57 @@ export function parseBilling(invoices) {
   return items;
 }
 
-export async function getBilling({ pageSize = 10, lastVisible = null } = {}) {
+export function buildBillingFilterConstraints(filters = {}) {
+  const constraints = [];
+  const allowedFilterFields = [
+    "ticket_id",
+    "user.email",
+    "user.phone",
+    "status",
+  ];
+
+  allowedFilterFields.forEach((field) => {
+    const parts = field.split('.');
+    const fieldResult = parts.length > 1 ? parts[1] : parts[0];
+    const value = filters[fieldResult];
+    if (value === undefined || value === null || value === "") return;
+    constraints.push(where(field, "==", value));
+  });
+
+  return constraints;
+}
+
+export async function getBilling({ pageSize = 10, lastVisible = null, filters = {} } = {}) {
   try {
     const constraints = [
+      ...buildBillingFilterConstraints(filters),
       orderBy("serial", "asc"),
-      limit(pageSize + 1),
     ];
+
+    
+    const qTotal = query(collection(db, BILLING_COLLECTION), ...constraints);
+    const snapshot = await getCountFromServer(qTotal);
+    const totalItems = snapshot.data().count;
+    
+    constraints.push(limit(pageSize + 1),);
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
     }
-
+    
     const q = query(collection(db, BILLING_COLLECTION), ...constraints);
     const querySnapshot = await getDocs(q);
+    
     const docs = querySnapshot.docs;
     const hasMore = docs.length > pageSize;
     const visibleDocs = hasMore ? docs.slice(0, pageSize) : docs;
     const items = parseBilling(visibleDocs);
-    const nextLastVisible =
-      visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
+    const nextLastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
     return {
       items,
       lastVisible: nextLastVisible,
       hasMore,
+      totalItems,
     };
   } catch (error) {
     console.error("Error getting billing in billing service layer:", error);

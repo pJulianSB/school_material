@@ -2,9 +2,11 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
 .adminContent {
   flex: 1;
+  min-width: 0;
   background-color: var(--background);
 }

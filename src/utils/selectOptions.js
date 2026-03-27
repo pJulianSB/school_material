@@ -60,3 +60,16 @@ export const PACKAGE_STATUS_MAP = PACKAGE_STATUS_OPTIONS.reduce((acc, opcion) =>
   acc[opcion.value] = opcion.label;
   return acc;
 }, {});
+
+export const BILLING_STATUS_OPTIONS = [
+  { value: "pending", label: "Pendiente" },
+  { value: "paid", label: "Pagado" },
+  { value: "rejected", label: "Rechazado" },
+  { value: "cancelled", label: "Cancelado" },
+  { value: "refunded", label: "Reembolsado" },
+];
+
+export const BILLING_STATUS_MAP = BILLING_STATUS_OPTIONS.reduce((acc, opcion) => {
+  acc[opcion.value] = opcion.label;
+  return acc;
+}, {});
