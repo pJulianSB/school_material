@@ -1,27 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./material.module.css";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import styles from "../material.module.css";
 import { Select } from "app/components/ui/Select";
 import { TextArea } from "app/components/ui/TextArea";
 import { LoadMaterial } from "app/components/LoadMaterial/LoadMaterial";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { MissingFields } from "app/components/ui/MissingFields";
+import { NotFoundComponent } from "app/components/NotFound/NotFound";
 import { sileo, Toaster } from "sileo";
-import { uploadMaterialPdf, createMaterialService, getMaterialLastSerial } from "app/services/materialService";
+import { uploadMaterialPdf, updateMaterialService, getMaterialById } from "app/services/materialService";
 import { TYPE_MATERIAL_OPTIONS, GRADES_OPTIONS, SUBJECTS_OPTIONS, MATERIAL_STATUS_OPTIONS } from "app/utils/selectOptions";
 
-export default function MaterialPage() {
+export default function MaterialEditPage() {
   const router = useRouter();
-  const [materialType, setMaterialType] = useState("malla");
-  const [description, setDescription] = useState("");
-  const [grade, setGrade] = useState("primero");
-  const [subject, setSubject] = useState("matematicas");
-  const [status, setStatus] = useState("free");
-  const [totalPackages, setTotalPackages] = useState(0);
+  const { materialId } = useParams();
+  const [materialData, setMaterialData] = useState({
+    type: "",
+    description: "",
+    grade: "",
+    subject: "",
+    status: "",
+    totalPackages: 0,
+    serial: 0,
+  });
   const [material, setMaterial] = useState({});
+  const [isNotFound, setIsNotFound] = useState(false);
+
+  useEffect(() => {
+    const getMaterial = async () => {
+      const materialDb = await getMaterialById(materialId);
+      if (!materialDb) {
+        setIsNotFound(true);
+        return;
+      }
+      setMaterialData({
+        type: materialDb.type,
+        description: materialDb.description,
+        grade: materialDb.grade,
+        subject: materialDb.subject,
+        status: materialDb.status,
+        totalPackages: materialDb.total_packages,
+        serial: materialDb.serial,
+      });
+      setMaterial(materialDb.material);
+    };
+    getMaterial();
+  }, [materialId]);
 
   const handleUploadMaterial = async (file) => {
     const { id, path, url: uploadedUrl } = await uploadMaterialPdf(file, { type: materialType });
@@ -37,24 +64,26 @@ export default function MaterialPage() {
   };
 
   const handleCancel = () => {
+    setMaterialData({
+      type: "",
+      description: "",
+      grade: "",
+      subject: "",
+      status: "",
+      totalPackages: 0,
+    });
     setMaterial({});
-    setTotalPackages(0);
-    setDescription("");
-    setMaterialType("malla");
-    setGrade("primero");
-    setSubject("matematicas");
-    setStatus("free");
     router.push("/admin/materialList");
   };
 
-  const createMaterial = async () => {
+  const updateMaterial = async () => {
     const missingFields = [];
 
-    if (!materialType) missingFields.push("Tipo de material");
-    if (!grade) missingFields.push("Grado");
-    if (!subject) missingFields.push("Área");
-    if (!status) missingFields.push("Estado");
-    if (!description.trim()) missingFields.push("Descripción");
+    if (!materialData.type) missingFields.push("Tipo de material");
+    if (!materialData.grade) missingFields.push("Grado");
+    if (!materialData.subject) missingFields.push("Área");
+    if (!materialData.status) missingFields.push("Estado");
+    if (!materialData.description.trim()) missingFields.push("Descripción");
     if (!material || !material.name) missingFields.push("Seleccionar documento PDF");
     if (!material.url) missingFields.push("Guardar documento PDF");
 
@@ -68,31 +97,39 @@ export default function MaterialPage() {
     }
 
     const payload = {
-      type: materialType,
-      description: description,
-      status: status,
-      subject: subject,
-      grade: grade,
-      total_packages:totalPackages,
+      type: materialData.type,
+      description: materialData.description,
+      status: materialData.status,
+      subject: materialData.subject,
+      grade: materialData.grade,
+      total_packages: materialData.totalPackages,
       material: {
         id: material.id,
         name: material.name,
         url: material.url,
         path: material.path,
       },
-      serial: await getMaterialLastSerial(),
-      active: true
+      serial: materialData.serial,
     };
 
-    await createMaterialService(payload);
+    await updateMaterialService(materialId, payload);
     router.push("/admin/materialList");
   };
+
+  if (isNotFound) {
+    return (
+      <NotFoundComponent
+        message="El material no existe o fue imposible obtenerlo de la base de datos."
+        buttonText="Regresar"
+        buttonOnClick={() => router.push("/admin/materialList")}
+      />
+    );
+  }
 
   return (
     <div className={styles.page}>
       <Toaster position="top-right" />
-      <h2>Crear material</h2>
-
+      <h2>Editar material</h2>
       <section className={styles.card}>
         <section className={styles.formMaterial}>
           <div className={styles.columnA}>
@@ -102,9 +139,9 @@ export default function MaterialPage() {
                 id="material-type"
                 name="materialType"
                 options={TYPE_MATERIAL_OPTIONS}
-                value={materialType}
+                value={materialData.type}
                 required={true}
-                onChange={(e) => setMaterialType(e.target.value)}
+                onChange={(e) => setMaterialData({ ...materialData, type: e.target.value })}
               />
             </label>
             <label htmlFor="grade" className={styles.field}>
@@ -113,9 +150,9 @@ export default function MaterialPage() {
                 id="grade"
                 name="grade"
                 options={GRADES_OPTIONS}
-                value={grade}
+                value={materialData.grade}
                 required={true}
-                onChange={(e) => setGrade(e.target.value)}
+                onChange={(e) => setMaterialData({ ...materialData, grade: e.target.value })}
               />
             </label>
             <label htmlFor="subject" className={styles.field}>
@@ -124,9 +161,9 @@ export default function MaterialPage() {
                 id="subject"
                 name="subject"
                 options={SUBJECTS_OPTIONS}
-                value={subject}
+                value={materialData.subject}
                 required={true}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => setMaterialData({ ...materialData, subject: e.target.value })}
               />
             </label>
           </div>
@@ -137,9 +174,9 @@ export default function MaterialPage() {
                 id="status"
                 name="status"
                 options={MATERIAL_STATUS_OPTIONS}
-                value={status}
+                value={materialData.status}
                 required={true}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setMaterialData({ ...materialData, status: e.target.value })}
               />
             </label>
             <label htmlFor="material-description" className={styles.field}>
@@ -148,21 +185,21 @@ export default function MaterialPage() {
                 id="material-description"
                 name="description"
                 rows={3}
-                value={description}
+                value={materialData.description}
                 required={true}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setMaterialData({ ...materialData, description: e.target.value })}
                 placeholder="Describe el material..."
               />
             </label>
             <label htmlFor="packagesNumber" className={styles.field}>
-              Número de paquetes: {totalPackages}
+              Número de paquetes: {materialData.totalPackages}
             </label>
           </div>
         </section>
         <section className={styles.documentContainer}>
           <LoadMaterial
             material= {material}
-            existingDocumentUrl={material.url}
+            existingDocumentUrl={material.url || ""}
             onUpload={handleUploadMaterial}
           />
         </section>
@@ -170,9 +207,9 @@ export default function MaterialPage() {
           <PrimaryButton
             type="button"
             className={styles.primaryButton}
-            onClick={createMaterial}
+            onClick={updateMaterial}
             >
-            Crear material
+            Editar material
           </PrimaryButton>
           <TertiaryButton
             type="button"
