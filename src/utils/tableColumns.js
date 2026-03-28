@@ -1,5 +1,6 @@
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { SeeIcon } from "app/components/icons/SeeIcon";
+import { useRouter } from "next/navigation";
 
 export const userColumns = [
   { id: "serial", header: "No", field: "serial", sortable: true, width: "60px" },
@@ -27,15 +28,19 @@ export const packageColumns = [
   { id: "total_documents", header: "# Docs", field: "total_documents", sortable: false },
   { id: "edit", header: "Editar", field: "edit", type: "button",
     renderCell: (row) => {
+      const router = useRouter();
+      const handleEdit = () => {
+        router.push(`/admin/package/${row.id}`);
+      };
       return (
         <PrimaryButton
           type="button"
-          onClick={() => console.log("row", row)}
+          onClick={handleEdit}
         >
           Editar
         </PrimaryButton>
       );
-   }
+   },
   },
 ];
 
@@ -60,10 +65,14 @@ export const documentColumns = [
   },
   { id: "edit", header: "Editar", field: "edit", type: "button",
     renderCell: (row) => {
+      const router = useRouter();
+      const handleEdit = () => {
+        router.push(`/admin/material/${row.id}`);
+      };
       return (
         <PrimaryButton
           type="button"
-          onClick={() => console.log("row", row)}
+          onClick={handleEdit}
         >
           Editar
         </PrimaryButton>

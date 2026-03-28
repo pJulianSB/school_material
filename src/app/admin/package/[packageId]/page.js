@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./package.module.css";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import styles from "../package.module.css";
 import { Select } from "app/components/ui/Select";
 import { Input } from "app/components/ui/Input";
 import { TextArea } from "app/components/ui/TextArea";
@@ -12,78 +12,89 @@ import { MissingFields } from "app/components/ui/MissingFields";
 import { DocPackage } from "app/components/DocPackage/DocPackage";
 import { SelectDocs } from "app/components/SelectDocs/SelectDocs";
 import { Drawer } from "app/components/Drawer/Drawer";
+import { NotFoundComponent } from "app/components/NotFound/NotFound";
 import { sileo, Toaster } from "sileo";
-import { createPackageService, getPackageLastSerial } from "app/services/packageService";
 import { getMaterialFiltered } from "app/services/materialService";
+import { getPackageById, updatePackageService } from "app/services/packageService";
 import { GRADES_OPTIONS, SUBJECTS_OPTIONS, PACKAGE_STATUS_OPTIONS, GRADES_MAP, SUBJECTS_MAP } from "app/utils/selectOptions";
 
 export default function PackagePage() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [grade, setGrade] = useState("primero");
-  const [subject, setSubject] = useState("matematicas");
-  const [status, setStatus] = useState("active");
-  const [price, setPrice] = useState("");
+  const { packageId } = useParams();
+  const [packageData, setPackageData] = useState({
+    title: "",
+    description: "",
+    grade: "",
+    subject: "",
+    status: "",
+    price: "",
+    serial: 0,
+    total_documents: 0,
+  });
   const [currentMaterials, setCurrentMaterials] = useState([]);
   const [documentList, setDocumentList] = useState([]);
-  const [isEdit, setIsEdit] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
+
+  useEffect(() => {
+    const getPackage = async () => {
+      const packageDb = await getPackageById(packageId);
+      if (!packageDb) {
+        setIsNotFound(true);
+        return;
+      }
+      setPackageData({
+        title: packageDb.title,
+        description: packageDb.description,
+        grade: packageDb.grade,
+        subject: packageDb.subject,
+        status: packageDb.status,
+        price: packageDb.price,
+        serial: packageDb.serial,
+        total_documents: packageDb.total_documents,
+      });
+      setCurrentMaterials(packageDb.materials);
+    };
+    getPackage();
+  }, [packageId]);
 
   const handleCancel = () => {
-    setIsEdit(false);
-    setTitle("");
-    setDescription("");
-    setGrade("primero");
-    setSubject("matematicas");
-    setStatus("active");
-    setPrice("");
-    setDocuments([]);
+    setPackageData({
+      title: "",
+      description: "",
+      grade: "",
+      subject: "",
+      status: "",
+      price: "",
+      serial: 0,
+      total_documents: 0,
+    });
+    setCurrentMaterials([]);
     router.push("/admin/packageList");
   };
 
-  const handlePackage = () => {
-    if (isEdit) {
-      updatePackage();
-      return
-    } 
-    createPackage();
-  };
-
-  const updatePackage = () => {
-    const payload = {
-      title: title,
-      description: description,
-      grade: grade,
-      subject: subject,
-      status: status,
-      price: price,
-      documents: documents,
-    };
-  };
-
-  const createPackage = async () => {
+  const updatePackage = async () => {
     const missingFields = [];
 
-    if (!title) missingFields.push("Título");
-    if (!grade) missingFields.push("Grado");
-    if (!subject) missingFields.push("Área");
-    if (!status) missingFields.push("Estado");
-    if (!price) missingFields.push("Precio");
-    if (!description.trim()) missingFields.push("Descripción");
+    if (!packageData.title) missingFields.push("Título");
+    if (!packageData.grade) missingFields.push("Grado");
+    if (!packageData.subject) missingFields.push("Área");
+    if (!packageData.status) missingFields.push("Estado");
+    if (!packageData.price) missingFields.push("Precio");
+    if (!packageData.description.trim()) missingFields.push("Descripción");
     if (currentMaterials.length === 0) missingFields.push("Debe agregar al menos un material.");
 
     if (missingFields.length > 0) {
       sileo.error({
-        title: "Error creando el paquete",
+        title: "Error actualizando el paquete",
         description: <MissingFields missingFields={missingFields} />,
         fill: "#FAB7FF",
       });
       return;
     }
 
-    const materials = currentMaterials.map((material) => ({
+    const materialsPayload = currentMaterials.map((material) => ({
       id: material.id,
       type: material.type_value,
       description: material.description,
@@ -93,17 +104,16 @@ export default function PackagePage() {
     }));
 
     const payload = {
-      title: title,
-      price: price,
-      description: description,
-      status: status,
-      subject: subject,
-      grade: grade,
+      title: packageData.title,
+      description: packageData.description,
+      grade: packageData.grade,
+      subject: packageData.subject,
+      status: packageData.status,
+      price: packageData.price,
+      materials: materialsPayload,
       total_documents: currentMaterials.length,
-      materials: materials,
-      serial: await getPackageLastSerial(),
     };
-    await createPackageService(payload);
+    await updatePackageService(packageId, payload);
     router.push("/admin/packageList");
   };
 
@@ -120,8 +130,8 @@ export default function PackagePage() {
     setIsDrawerOpen(true);
     setIsLoadingDocuments(true);
     const filters = {
-      subject: subject,
-      grade: grade,
+      subject: packageData.subject,
+      grade: packageData.grade,
     };
     const materials = await getMaterialFiltered(filters);
     setDocumentList(materials.items);
@@ -132,10 +142,20 @@ export default function PackagePage() {
     setIsDrawerOpen(false);
   };
 
+  if (isNotFound) {
+    return (
+      <NotFoundComponent
+        message="El paquete no existe o fue imposible obtenerlo de la base de datos."
+        buttonText="Regresar"
+        buttonOnClick={() => router.push("/admin/packageList")}
+      />
+    );
+  }
+
   return (
     <div className={styles.page}>
       <Toaster position="top-right" />
-      <h2>Crear paquete</h2>
+      <h2>Editar paquete</h2>
 
       <section className={styles.card}>
         <section className={styles.formMaterial}>
@@ -145,9 +165,9 @@ export default function PackagePage() {
               <Input
                 id="title"
                 name="title"
-                value={title}
+                value={packageData.title}
                 required={true}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => setPackageData({ ...packageData, title: e.target.value })}
               />
             </label>
             <label htmlFor="price" className={styles.field}>
@@ -155,9 +175,9 @@ export default function PackagePage() {
               <Input
                 id="price"
                 name="price"
-                value={price}
+                value={packageData.price}
                 required={true}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => setPackageData({ ...packageData, price: e.target.value })}
               />
             </label>
             <label htmlFor="documentsNumber" className={styles.field}>
@@ -171,9 +191,9 @@ export default function PackagePage() {
                 id="subject"
                 name="subject"
                 options={SUBJECTS_OPTIONS}
-                value={subject}
+                value={packageData.subject}
                 required={true}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => setPackageData({ ...packageData, subject: e.target.value })}
               />
             </label>
             <label htmlFor="grade" className={styles.field}>
@@ -182,9 +202,9 @@ export default function PackagePage() {
                 id="grade"
                 name="grade"
                 options={GRADES_OPTIONS}
-                value={grade}
+                value={packageData.grade}
                 required={true}
-                onChange={(e) => setGrade(e.target.value)}
+                onChange={(e) => setPackageData({ ...packageData, grade: e.target.value })}
               />
             </label>
             <label htmlFor="status" className={styles.field}>
@@ -193,9 +213,9 @@ export default function PackagePage() {
                 id="status"
                 name="status"
                 options={PACKAGE_STATUS_OPTIONS}
-                value={status}
+                value={packageData.status}
                 required={true}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setPackageData({ ...packageData, status: e.target.value })}
               />
             </label>
           </div>
@@ -207,9 +227,9 @@ export default function PackagePage() {
               id="package-description"
               name="description"
               rows={3}
-              value={description}
+              value={packageData.description}
               required={true}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setPackageData({ ...packageData, description: e.target.value })}
               placeholder="Describe el paquete..."
             />
           </label>
@@ -234,9 +254,9 @@ export default function PackagePage() {
           <PrimaryButton
             type="button"
             className={styles.primaryButton}
-            onClick={handlePackage}
+            onClick={updatePackage}
             >
-            Crear paquete
+            Editar paquete
           </PrimaryButton>
           <TertiaryButton
             type="button"
@@ -255,8 +275,8 @@ export default function PackagePage() {
         <SelectDocs
           documents={documentList}
           isLoading={isLoadingDocuments}
-          subject={SUBJECTS_MAP[subject]}
-          grade={GRADES_MAP[grade]}
+          subject={SUBJECTS_MAP[packageData.subject]}
+          grade={GRADES_MAP[packageData.grade]}
           currentMaterials={currentMaterials}
           onAddMaterial={handleAddMaterial}
         />
