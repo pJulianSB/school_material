@@ -1,6 +1,9 @@
 import {
   addDoc, 
+  updateDoc,
+  doc,
   collection, 
+  getDoc,
   getDocs, 
   getCountFromServer, 
   limit, 
@@ -86,6 +89,26 @@ export async function createMaterialService(payload) {
   }
 }
 
+export async function updateMaterialService(materialId, payload) {
+  try {
+    if (!materialId || !payload) {
+      throw new Error("No hay información para actualizar el material");
+    }
+
+    const data = {
+      ...payload,
+      update_date: serverTimestamp(),
+    };
+
+    await updateDoc(doc(db, MATERIALS_COLLECTION, materialId), data);
+    return { id: materialId };
+
+  } catch (error) {
+    console.error("Error in material service layer:", error);
+    throw new Error("No fue posible actualizar el material");
+  }
+}
+
 async function getNextSerialByField(fieldName, collectionName) {
   const collectionRef = collection(db, collectionName);
   const q = query(collectionRef, orderBy(fieldName, "desc"), limit(1));
@@ -121,12 +144,16 @@ export function parseMaterials(docs) {
     serial: doc.data().serial,
     description: doc.data().description,
     type: TYPE_MATERIAL_MAP[doc.data().type],
+    type_value: doc.data().type,
     subject: SUBJECTS_MAP[doc.data().subject],
+    subject_value: doc.data().subject,
     grade: GRADES_MAP[doc.data().grade],
+    grade_value: doc.data().grade,
     total_packages: doc.data().total_packages,
     material_url: doc.data().material?.url || doc.data().material_url || "",
     material_id: doc.data().material?.id || doc.data().material_id || "",
     material_name: doc.data().material?.name || doc.data().material_name || "",
+    material_path: doc.data().material?.path || doc.data().material_path || "",
     status: MATERIAL_STATUS_MAP[doc.data().status],
   }));
   return items;
@@ -200,5 +227,25 @@ export async function getMaterialFiltered(filters = {}) {
   } catch (error) {
     console.error("Error getting materials in material service layer:", error);
     throw new Error("No fue posible obtener los materiales");
+  }
+}
+
+export async function getMaterialById(materialId = "") {
+  try {
+    if (!materialId) {
+      throw new Error("No se recibió el id del material");
+    }
+    const docRef = doc(db, MATERIALS_COLLECTION, materialId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return null;
+    }
+    const data = docSnap.data();
+    return { id: docSnap.id, ...data };
+  }
+  catch (error) {
+    console.error("Error getting material by id in material service layer:", error);
+    throw new Error("No fue posible obtener el material");
   }
 }

@@ -1,11 +1,14 @@
 import {
   collection, 
   addDoc, 
+  updateDoc,
+  doc,
   serverTimestamp, 
   limit, 
   orderBy, 
   query, 
   startAfter, 
+  getDoc,
   getDocs, 
   where, 
   getCountFromServer 
@@ -33,6 +36,26 @@ export const createPackageService = async (packageData) => {
     throw new Error("It was not possible to create the package");
   }
 };
+
+export async function updatePackageService(packageId, payload) {
+  try {
+    if (!packageId || !payload) {
+      throw new Error("No hay información para actualizar el paquete");
+    }
+
+    const data = {
+      ...payload,
+      update_date: serverTimestamp(),
+    };
+
+    await updateDoc(doc(db, PACKAGE_COLLECTION, packageId), data);
+    return { id: packageId };
+
+  } catch (error) {
+    console.error("Error in package service layer:", error);
+    throw new Error("No fue posible actualizar el paquete");
+  }
+}
 
 async function getNextSerialByField(fieldName, collectionName) {
   const collectionRef = collection(db, collectionName);
@@ -135,5 +158,25 @@ export async function getPackages({ pageSize = 10, lastVisible = null, filters =
   } catch (error) {
     console.error("Error getting packages in package service layer:", error);
     throw new Error("No fue posible obtener los paquetes");
+  }
+}
+
+export async function getPackageById(packageId = "") {
+  try {
+    if (!packageId) {
+      throw new Error("No se recibió el id del paquete");
+    }
+    const docRef = doc(db, PACKAGE_COLLECTION, packageId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return null;
+    }
+    const data = docSnap.data();
+    return { id: docSnap.id, ...data };
+  }
+  catch (error) {
+    console.error("Error getting package by id in package service layer:", error);
+    throw new Error("No fue posible obtener el paquete");
   }
 }
