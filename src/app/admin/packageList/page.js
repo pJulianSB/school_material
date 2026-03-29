@@ -7,7 +7,7 @@ import { packageColumns } from "app/utils/tableColumns";
 import { sortData } from "app/utils/tableUtils";
 import { DataTable } from "app/components/ui/DataTable";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
-import PackageFilter from "./PackageFilter";
+import PackageFilter from "./_components/PackageFilter/PackageFilter";
 import { getPackages } from "app/services/packageService";
 
 export default function PackageListPage() {

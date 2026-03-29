@@ -8,7 +8,7 @@ import { DataTable } from "app/components/ui/DataTable";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { getMaterials } from "app/services/materialService";
 import { sortData } from "app/utils/tableUtils";
-import MaterialFilter from "./MaterialFilter";
+import MaterialFilter from "./_components/MaterialFilter/MaterialFilter";
 
 export default function MaterialListPage() {
   const router = useRouter();
