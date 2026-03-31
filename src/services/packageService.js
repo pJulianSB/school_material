@@ -120,6 +120,7 @@ export function parsePackages(docs) {
     status: PACKAGE_STATUS_MAP[doc.data().status],
     price: doc.data().price,
     total_documents: doc.data().total_documents,
+    materials: doc.data().materials,
   }));
   return items;
 }
@@ -135,6 +136,7 @@ export async function getPackages({ pageSize = 10, lastVisible = null, filters =
     const snapshot = await getCountFromServer(qTotal);
     const totalItems = snapshot.data().count;
 
+    
     constraints.push(limit(pageSize + 1),);
     if (lastVisible) {
       constraints.push(startAfter(lastVisible));
