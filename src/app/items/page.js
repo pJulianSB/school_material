@@ -4,7 +4,7 @@ import styles from "./items.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Drawer } from "app/components/Drawer/Drawer";
-import { PackageDetail } from "./_components/PackageDetail/PackageDetail";
+import { PackageDetail } from "app/components/PackageDetail/PackageDetail";
 import { PackageCard } from "./_components/PackageCard/PackageCard";
 import { ItemsFilter } from "./_components/ItemsFilter/ItemsFilter";
 import { Loading } from "app/components/ui/Loading";
@@ -60,7 +60,7 @@ export default function ItemsPage() {
       try {
         const previousCursor = page > 1 ? pageCursorsRef.current[page - 1] : null;
         const { items, lastVisible, hasMore } = await getPackages({
-          pageSize: 4,
+          pageSize: 8,
           lastVisible: previousCursor || null,
           filters: activeFilters || {},
         });
