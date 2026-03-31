@@ -3,7 +3,10 @@
 import styles from "./items.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "app/store/useCartStore";
+import { sileo, Toaster } from "sileo";
 import { Drawer } from "app/components/Drawer/Drawer";
+import { Cart } from "app/components/icons/Cart";
 import { PackageDetail } from "app/components/PackageDetail/PackageDetail";
 import { PackageCard } from "./_components/PackageCard/PackageCard";
 import { ItemsFilter } from "./_components/ItemsFilter/ItemsFilter";
@@ -36,14 +39,7 @@ export default function ItemsPage() {
   const pageCursorsRef = useRef({});
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [packageData, setPackageData] = useState({
-    title: "",
-    description: "",
-    grade: "",
-    subject: "",
-    price: "",
-    materials: []
-  });
+  const [packageData, setPackageData] = useState({});
   const [page, setPage] = useState(1);
   const [packagesList, setPackagesList] = useState([]);
   const [activeFilters, setActiveFilters] = useState({});
@@ -110,20 +106,27 @@ export default function ItemsPage() {
     setPage(page + 1);
   };
 
-  const handleAddPackageToCart = () => {
-    console.log("Agregar al carrito");
+  const handleAddPackageToCart = (packageInfo) => {
+    setIsDrawerOpen(false);
+    const currentItems = useCartStore.getState().cartItems;
+    const alreadyExists = currentItems.some((item) => item.id === packageInfo.id);
+    if (alreadyExists) {
+      sileo.error({ 
+        title: "Error agregando el paquete",
+        description: "El paquete ya fue agregado previamente al carrito y no es posible agregarlo nuevamente.",
+        fill: "#FAB7FF",
+      });
+      return;
+    }
+    useCartStore.getState().addToCart(packageInfo);
+    const totalPrice = parseFloat(useCartStore.getState().totalPrice) + parseFloat(packageInfo.price);
+    useCartStore.getState().updateTotalPrice(totalPrice);
+    sileo.success({ title: `${packageInfo.title} agregado al carrito` });
   };
 
   const handlePackageDetail = (packageInfo) => {
     setIsDrawerOpen(true);
-    setPackageData({
-      title: packageInfo.title,
-      description: packageInfo.description,
-      grade: packageInfo.grade,
-      subject: packageInfo.subject,
-      price: packageInfo.price,
-      materials: packageInfo.materials
-    });
+    setPackageData(packageInfo);
   };
 
   const handleCloseDrawer = () => {
@@ -132,8 +135,15 @@ export default function ItemsPage() {
 
   return (
     <div className={styles.page}>
+      <Toaster position="top-right" />
       <section className={styles.header}>
         <h2>Descubre nuestros productos</h2>
+        <PrimaryButton
+          type="button"
+          onClick={() => router.push("/cart")}
+        >
+          <Cart /> Ir al carrito 
+        </PrimaryButton>
       </section>
       <section className={styles.filterContainer}>
         <ItemsFilter 
@@ -150,7 +160,7 @@ export default function ItemsPage() {
               packageData={packageInfo}
               onAddToCart={handleAddPackageToCart}
               onViewDetail={handlePackageDetail}
-                />
+            />
           ))}
         </section>
         <section className={styles.loadingContainer}>

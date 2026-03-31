@@ -9,9 +9,10 @@
 .header {
   width: 100%;
   max-width: 1300px;
-  margin-bottom: 16px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .filterContainer {

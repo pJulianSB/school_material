@@ -18,7 +18,7 @@ export function Drawer({ isOpen = false, title = "", onClose, hasAction = false,
 
       <div className={styles.footer}>
         { hasAction && (
-          <PrimaryButton type="button" onClick={onAction}>
+          <PrimaryButton type="button" onClick={() => onAction(children.props.packageData)}>
             {actionLabel}
           </PrimaryButton>
         )}

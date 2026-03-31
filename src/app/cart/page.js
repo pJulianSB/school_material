@@ -1,8 +1,9 @@
 "use client";
 
 import styles from "./cart.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "app/store/useCartStore";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { Drawer } from "app/components/Drawer/Drawer";
@@ -28,17 +29,36 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleCancel = () => {
-    router.push("/items");
-  };
+  useEffect(() => {
+    setPackageItems(useCartStore.getState().cartItems);
+    setTotalPrice(useCartStore.getState().totalPrice);
+  }, []);
 
-  const handleRemovePackage = (id) => {
-    setPackageItems(packageItems.filter((packageItem) => packageItem.id !== id));
+  const handleCancel = () => {
+    useCartStore.getState().clearCart();
+    setPackageItems([]);
+    setTotalPrice(0);
+    sileo.success({ title: "Carrito vaciado" });
+    router.push("/");
   };
 
   const handlePurchaseProcess = () => {
     console.log("Iniciar proceso de compra");
   };
+
+  const handleRemovePackage = (id, price) => {
+    useCartStore.getState().removeFromCart(id);
+    const priceUpdated = parseFloat(useCartStore.getState().totalPrice) - parseFloat(price);
+    useCartStore.getState().updateTotalPrice(priceUpdated);
+    setPackageItems(packageItems.filter((packageItem) => packageItem.id !== id));
+    setTotalPrice(priceUpdated);
+    sileo.success({ title: "Paquete removido correctamente" });
+  };
+
+  const handleViewDetails = (packageData) => {
+    setPackageData(packageData)
+    setIsDrawerOpen(true);
+  }
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
@@ -60,6 +80,7 @@ export default function CartPage() {
           <PackageItems
             packageItems={packageItems}
             onRemove={handleRemovePackage}
+            onViewDetails={handleViewDetails}
           />
           <p className={styles.totalPrice}>Precio Total:  <Price value={totalPrice}/></p>
         </section>
@@ -69,7 +90,14 @@ export default function CartPage() {
             className={styles.primaryButton}
             onClick={handlePurchaseProcess}
             >
-            Iniciar Proceso de Compra
+            Completar compra
+          </PrimaryButton>
+          <PrimaryButton
+            type="button"
+            className={styles.primaryButton}
+            onClick={() => router.push("/items")}
+            >
+            Continuar comprando
           </PrimaryButton>
           <TertiaryButton
             type="button"

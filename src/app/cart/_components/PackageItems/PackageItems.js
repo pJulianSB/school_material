@@ -2,7 +2,7 @@
 
 import styles from "./PackageItems.module.css";
 
-export function PackageItems({ packageItems, onRemove }) {
+export function PackageItems({ packageItems, onRemove, onViewDetails }) {
 
   return (
     <div className={styles.container}>
@@ -40,7 +40,7 @@ export function PackageItems({ packageItems, onRemove }) {
             <span>{index + 1}</span>
           </div>
 
-          <div className={`${styles.cell} ${styles.typeCell}`} role="cell">
+          <div className={`${styles.cell} ${styles.titleCell}`} role="cell">
             <span className={styles.mobileLabel}>Titulo</span>
             <span>{packageItem.title}</span>
           </div>
@@ -69,7 +69,7 @@ export function PackageItems({ packageItems, onRemove }) {
             <span className={styles.mobileLabel}>Ver</span>
             <button
               type="button"
-              onClick={() => onViewDetails(packageItem.id)}
+              onClick={() => onViewDetails(packageItem)}
               className={styles.iconButton}
               aria-label={`Ver detalles del paquete ${index + 1}`}
               title="Ver detalles del paquete"
@@ -86,7 +86,7 @@ export function PackageItems({ packageItems, onRemove }) {
             <span className={styles.mobileLabel}>Remover</span>
             <button
               type="button"
-              onClick={() => onRemove(packageItem.id)}
+              onClick={() => onRemove(packageItem.id, packageItem.price)}
               className={styles.iconButton}
               aria-label={`Remover paquete ${index + 1}`}
               title="Remover paquete"
