@@ -8,6 +8,7 @@ import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
 import { Drawer } from "app/components/Drawer/Drawer";
 import { Price } from "app/components/ui/Price";
+import { Modal } from "app/components/ui/Modal";
 import { PackageDetail } from "app/components/PackageDetail/PackageDetail";
 import { PackageItems } from "./_components/PackageItems/PackageItems";
 import { sileo, Toaster } from "sileo";
@@ -17,29 +18,41 @@ export default function CartPage() {
   const [ticketNumber, setTicketNumber] = useState("0001");
   const [packageItems, setPackageItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [packageData, setPackageData] = useState({
-    id: "",
-    title: "",
-    description: "",
-    grade: "",
-    subject: "",
-    price: "",
-    materials: []
-  });
+  const [packageData, setPackageData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [packageToRemove, setPackageToRemove] = useState(null);
+  const [modalData, setModalData] = useState({
+    title: "",
+    description: "",
+    primaryLabel: "",
+    onPrimaryAction: () => {},
+    onCancelAction: () => {},
+  });
 
   useEffect(() => {
     setPackageItems(useCartStore.getState().cartItems);
     setTotalPrice(useCartStore.getState().totalPrice);
   }, []);
 
-  const handleCancel = () => {
+  const handleConfirmClearCart = () => {
     useCartStore.getState().clearCart();
     setPackageItems([]);
     setTotalPrice(0);
     sileo.success({ title: "Carrito vaciado" });
     router.push("/");
+  }
+
+  const handleCancel = () => {
+    setModalData({
+      title: "Cancelar compra",
+      description: "El carrito de compra se limpiará, esta acción no podrá ser revertida.",
+      primaryLabel: "Si, cancelar",
+      onPrimaryAction: handleConfirmClearCart,
+      onCancelAction: () => { setIsModalOpen(false); },
+    });
+    setIsModalOpen(true);
   };
 
   const handlePurchaseProcess = () => {
@@ -47,12 +60,36 @@ export default function CartPage() {
   };
 
   const handleRemovePackage = (id, price) => {
+    setPackageToRemove({ id, price });
+    setModalData({
+      title: "Remover paquete del carrito de compra.",
+      description: "¿Esta seguro que desea remover el paquete del carrito de compra?",
+      primaryLabel: "Remover",
+      onPrimaryAction: handleConfirmRemovePackage,
+      onCancelAction: handleCancelRemovePackage,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmRemovePackage = () => {
+    if (!packageToRemove) return;
+
+    const { id, price } = packageToRemove;
     useCartStore.getState().removeFromCart(id);
-    const priceUpdated = parseFloat(useCartStore.getState().totalPrice) - parseFloat(price);
+    const priceUpdated = Math.max(0, parseFloat(totalPrice) - parseFloat(price));
     useCartStore.getState().updateTotalPrice(priceUpdated);
-    setPackageItems(packageItems.filter((packageItem) => packageItem.id !== id));
+    setPackageItems((prevItems) =>
+      prevItems.filter((packageItem) => packageItem.id !== id)
+    );
     setTotalPrice(priceUpdated);
     sileo.success({ title: "Paquete removido correctamente" });
+    setPackageToRemove(null);
+    setIsModalOpen(false);
+  };
+
+  const handleCancelRemovePackage = () => {
+    setPackageToRemove(null);
+    setIsRemoveModalOpen(false);
   };
 
   const handleViewDetails = (packageData) => {
@@ -115,6 +152,15 @@ export default function CartPage() {
       >
         <PackageDetail packageData={packageData} />
       </Drawer>
+      <Modal
+        isOpen={isModalOpen}
+        title={modalData.title}
+        primaryLabel={modalData.primaryLabel}
+        onPrimaryAction={modalData.onPrimaryAction}
+        onCancelAction={modalData.onCancelAction}
+      >
+        <p>{modalData.description}</p>
+      </Modal>
     </div>
   );
 }
