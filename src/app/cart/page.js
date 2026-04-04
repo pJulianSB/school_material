@@ -89,7 +89,7 @@ export default function CartPage() {
 
   const handleCancelRemovePackage = () => {
     setPackageToRemove(null);
-    setIsRemoveModalOpen(false);
+    setIsModalOpen(false);
   };
 
   const handleViewDetails = (packageData) => {
@@ -125,24 +125,24 @@ export default function CartPage() {
           <PrimaryButton
             type="button"
             className={styles.primaryButton}
-            onClick={handlePurchaseProcess}
-            >
-            Completar compra
-          </PrimaryButton>
-          <PrimaryButton
-            type="button"
-            className={styles.primaryButton}
             onClick={() => router.push("/items")}
-            >
+          >
             Continuar comprando
           </PrimaryButton>
           <TertiaryButton
             type="button"
             disabled={false}
             onClick={handleCancel}
-            >
-              Cancelar
+          >
+            Cancelar
           </TertiaryButton>
+          <PrimaryButton
+            type="button"
+            className={styles.primaryButton}
+            onClick={() => router.push("/payment")}
+          >
+            Proceso de pago
+          </PrimaryButton>
         </section>
       </section>
       <Drawer

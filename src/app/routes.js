@@ -4,6 +4,7 @@ export const routes = [
   { path: "/company", label: "Empresa", title: "Asesorias Pedagógicas", subtitle: "Conoce nuestro equipo" },
   { path: "/contact", label: "Contacto", title: "Contáctanos", subtitle: "" },
   { path: "/cart", label: "Carrito", title: "Carrito de Compra", subtitle: "" },
+  { path: "/payment", label: "Pago", title: "Proceso de Compra", subtitle: "" },
   { path: "/login", label: "Login", title: "", subtitle: "" },
   { path: "/admin", label: "Ventas", title: "Vista de Administrador", subtitle: "", isSidebar: true },
   { path: "/admin/users", label: "Usuarios", title: "Usuarios", subtitle: "", isSidebar: true },

@@ -30,6 +30,7 @@ export function Header() {
           <h1 className={styles.title}>{title}</h1>
           <p className={styles.subtitle}>{subtitle}</p>
         </div>
+        <div className={styles.centerTitle}></div>
       </section>
     </header>
   );

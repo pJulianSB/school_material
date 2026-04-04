@@ -42,8 +42,16 @@
   opacity: 0.9;
 }
 
+.centerTitle {
+  width: 170px;
+  display: block;
+}
+
 @media (max-width: 600px) {
   .logoSection {
     flex-direction: column;
+  }
+  .centerTitle {
+    display: none;  
   }
 }
