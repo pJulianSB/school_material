@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./payment.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "app/store/useCartStore";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
@@ -18,6 +18,7 @@ import { UserData } from "./_components/UserData/UserData";
 import { PaymentInfo } from "./_components/PaymentInfo/PaymentInfo";
 import { UserReceipt } from "./_components/UserReceipt/UserReceipt";
 import { PurchaseConfirmation } from "./_components/PurchaseConfirmation/PurchaseConfirmation";
+import { processOrderAction } from "app/actions/checkoutActions";
 import { sileo, Toaster } from "sileo";
 
 export default function PaymentPage() {
@@ -32,6 +33,8 @@ export default function PaymentPage() {
     onPrimaryAction: () => {},
     onCancelAction: () => {},
   });
+  const [isPending, startTransition] = useTransition();
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleConfirmGoBackCart = () => {
     router.push("/cart");
@@ -49,7 +52,28 @@ export default function PaymentPage() {
   };
 
   const handlePurchaseProcess = () => {
-    console.log("Iniciar proceso de compra");
+    setErrorMessage(null);
+
+    // Mock de los datos del cliente ingresados en un formulario previo
+    const customerData = {
+      email: 'student@example.com',
+      name: 'Jane Doe',
+      paymentToken: 'tok_12345' 
+    };
+
+    // startTransition mantiene la UI responsiva mientras el servidor trabaja
+    startTransition(async () => {
+      // Llamamos al Server Action directamente
+      const response = await processOrderAction(cartItems, customerData);
+
+      if (response.success) {
+        // Limpiamos el Zustand localStorage y redirigimos al éxito
+        clearCart();
+        router.push(`/success?order=${response.orderId}`);
+      } else {
+        setErrorMessage(response.error);
+      }
+    });
   };
 
   return (
