@@ -1,9 +1,10 @@
 "use client";
 
 import { TertiaryButton } from "app/components/ui/TertiaryButton";
+import { PrimaryButton } from "app/components/ui/PrimaryButton";
 import styles from "./drawer.module.css";
 
-export function Drawer({ isOpen = false, title = "", onClose, children }) {
+export function Drawer({ isOpen = false, title = "", onClose, hasAction = false, onAction, actionLabel = "Guardar", children }) {
   return (
     <aside
       className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
@@ -16,6 +17,11 @@ export function Drawer({ isOpen = false, title = "", onClose, children }) {
       <div className={styles.content}>{children}</div>
 
       <div className={styles.footer}>
+        { hasAction && (
+          <PrimaryButton type="button" onClick={() => onAction(children.props.packageData)}>
+            {actionLabel}
+          </PrimaryButton>
+        )}
         <TertiaryButton type="button" onClick={onClose}>
           Cancelar
         </TertiaryButton>

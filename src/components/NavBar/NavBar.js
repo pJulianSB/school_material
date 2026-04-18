@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SecondaryButton } from "app/components/ui/SecondaryButton";
+import styles from "./NavBar.module.css";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { hasValidSessionToken, observeAuthState } from "app/services/authenticationService";
-import styles from "./NavBar.module.css";
+import { SecondaryButton } from "app/components/ui/SecondaryButton";
+import { Cart as CartIcon } from "app/components/icons/Cart";
 
 export function NavBar() {
   const pathname = usePathname();
@@ -41,7 +42,15 @@ export function NavBar() {
         className={`${styles.link} ${pathname === "/" ? styles.active : ""}`}
         aria-current={pathname === "/" ? "page" : undefined}
       >
-        Material
+        Inicio
+      </Link>
+      <Link
+        key="/items"
+        href="/items"
+        className={`${styles.link} ${pathname === "/items" ? styles.active : ""}`}
+        aria-current={pathname === "/items" ? "page" : undefined}
+      >
+        Paquetes
       </Link>
       <Link
         key="/company"
@@ -58,6 +67,14 @@ export function NavBar() {
         aria-current={pathname === "/contact" ? "page" : undefined}
       >
         Contacto
+      </Link>
+      <Link
+        key="/cart"
+        href="/cart"
+        className={`${styles.link} ${pathname === "/cart" ? styles.active : ""}`}
+        aria-current={pathname === "/cart" ? "page" : undefined}
+      >
+        <CartIcon />
       </Link>
       {showAdmin ? (
         <Link

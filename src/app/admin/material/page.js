@@ -164,6 +164,7 @@ export default function MaterialPage() {
             material= {material}
             existingDocumentUrl={material.url}
             onUpload={handleUploadMaterial}
+            onlyPdf={true}
           />
         </section>
         <section className={styles.rowBtns}>
