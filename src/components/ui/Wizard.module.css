@@ -1,0 +1,98 @@
+.wizard {
+  width: 100%;
+  border: 1px solid var(--color-primary-light3);
+  border-radius: 14px;
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  padding: 14px;
+  border-bottom: 1px solid var(--color-primary-light2);
+  overflow-x: auto;
+}
+
+.stepItem {
+  min-width: 120px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--color-primary-light3);
+  color: var(--color-primary-dark2);
+  background-color: var(--color-primary-light2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepIconActive {
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.stepTitle {
+  color: var(--color-primary-dark2);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stepTitleActive {
+  color: var(--color-primary);
+}
+
+.body {
+  width: 100%;
+  max-width: 1000px;
+  padding: 14px 30px;
+  color: var(--color-primary-dark2);
+}
+
+.footer {
+  width: 100%;
+  margin-top: auto;
+  padding: 14px;
+  border-top: 1px solid var(--color-primary-light2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lastStepActions {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .stepItem {
+    min-width: 160px;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lastStepActions {
+    width: 100%;
+  }
+
+  .lastStepActions :global(button),
+  .footer :global(button) {
+    width: 100%;
+  }
+}

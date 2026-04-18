@@ -1,7 +1,72 @@
-import { collection, addDoc, serverTimestamp, limit, orderBy, query, startAfter, getDocs } from "firebase/firestore";
-import { db } from "app/lib/firebase/config";
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  limit, 
+  orderBy, 
+  query, 
+  startAfter, 
+  getDocs 
+} from "firebase/firestore";
+import { 
+  getDownloadURL, 
+  uploadBytes, 
+  ref 
+} from "firebase/storage";
+import { db, storage } from "app/lib/firebase/config";
 
-const BILLING_COLLECTION = "billing";
+const SALES_SUPPORT_COLLECTION = "sales_support";
+const SALES_SUPPORT_DOCS_COLLECTION = "documents";
+
+function sanitizeFileName(name) {
+  return name.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9._-]/g, "");
+}
+
+export async function uploadSaleSupport(file, metadata = {}) {
+  try {
+    if (!file) {
+      throw new Error("No se recibió archivo para cargar");
+    }
+
+    const isPdfMime = file.type === "application/pdf";
+    const isImageMime = file.type.startsWith("image/");
+    const isPdfName = file.name.toLowerCase().endsWith(".pdf");
+    const isImageName = file.name.toLowerCase().endsWith(".jpg") || file.name.toLowerCase().endsWith(".jpeg") || file.name.toLowerCase().endsWith(".png") || file.name.toLowerCase().endsWith(".gif") || file.name.toLowerCase().endsWith(".bmp") || file.name.toLowerCase().endsWith(".tiff") || file.name.toLowerCase().endsWith(".ico") || file.name.toLowerCase().endsWith(".webp");
+    if (!isPdfMime && !isPdfName && !isImageMime && !isImageName) {
+      throw new Error("El archivo debe ser un PDF o una imagen");
+    }
+
+    const safeName = sanitizeFileName(file.name);
+    const timestamp = Date.now();
+    const uniqueName = `${timestamp}_${safeName}`;
+    const storagePath = `billing/${uniqueName}`;
+    const storageRef = ref(storage, storagePath);
+
+    await uploadBytes(storageRef, file, {
+      contentType: isPdfMime ? "application/pdf" : "image/jpeg",
+    });
+
+    const downloadURL = await getDownloadURL(storageRef);
+
+    const payload = {
+      name: file.name,
+      url: downloadURL,
+      path: storagePath,
+      content_type: file.type || (isPdfMime ? "application/pdf" : "image/jpeg"),
+      size: file.size || 0,
+      metadata,
+      creation_date: serverTimestamp(),
+      active: true,
+    };
+
+    const docRef = await addDoc(collection(db, SALES_SUPPORT_DOCS_COLLECTION), payload);
+
+    return { id: docRef.id, path: storagePath, url: downloadURL };
+  } catch (error) {
+    console.error("Error in sales support service layer:", error);
+    throw new Error("No fue posible cargar el documento PDF o imagen");
+  }
+}
 
 export const createSalesService = async (salesData) => {
   try {

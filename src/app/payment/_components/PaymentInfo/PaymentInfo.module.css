@@ -1,0 +1,117 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.methodsSection {
+  width: 70%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.methodCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-primary-light3);
+  border-radius: 12px;
+  padding: 10px;
+  background-color: var(--color-primary-light2);
+}
+
+.imageColumn {
+  flex: 0 0 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;  
+}
+
+.textColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.methodTitle {
+  margin: 0;
+  color: var(--color-primary-dark2);
+}
+
+.methodSubtitle {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+.accountOwnerSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--color-primary);
+}
+
+.ownerLabels {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ownerLabel {
+  color: var(--color-primary-dark2);
+}
+
+.instructionsSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paymentInfoSection {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.instructionsSection :global(textarea) {
+  width: 100%;
+  resize: none;
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .methodCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .imageColumn {
+    flex: none;
+    width: 100%;
+    height: 160px;
+  }
+}

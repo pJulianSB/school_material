@@ -1,12 +1,15 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { sileo, Toaster } from "sileo";
 import styles from "./LoadMaterial.module.css";
+import { SeeIcon } from "app/components/icons/SeeIcon";
 
 export function LoadMaterial({
   material = "",
   existingDocumentUrl = "",
   onUpload,
+  onlyPdf = true,
 }) {
   const inputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -21,11 +24,25 @@ export function LoadMaterial({
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      sileo.error({
+        title: "Error al seleccionar el archivo",
+        description: "No se seleccionó ningún archivo",
+        fill: "#FAB7FF",
+      });
+      return;
+    }
 
     const isPdfMime = file.type === "application/pdf";
     const isPdfName = file.name.toLowerCase().endsWith(".pdf");
-    if (!isPdfMime && !isPdfName) {
+    const isImageMime = file.type.startsWith("image/");
+    const isImageName = file.name.toLowerCase().endsWith(".jpg") || file.name.toLowerCase().endsWith(".jpeg") || file.name.toLowerCase().endsWith(".png") || file.name.toLowerCase().endsWith(".gif") || file.name.toLowerCase().endsWith(".bmp") || file.name.toLowerCase().endsWith(".tiff") || file.name.toLowerCase().endsWith(".ico") || file.name.toLowerCase().endsWith(".webp");
+    if (!isPdfMime && !isPdfName && !isImageMime && !isImageName) {
+      sileo.error({
+        title: "Error al seleccionar el archivo",
+        description: "El archivo seleccionado no es válido",
+        fill: "#FAB7FF",
+      });
       setSelectedFile(null);
       return;
     }
@@ -34,7 +51,14 @@ export function LoadMaterial({
   };
 
   const handleUploadClick = async () => {
-    if (!selectedFile || typeof onUpload !== "function") return;
+    if (!selectedFile || typeof onUpload !== "function") {
+      sileo.error({
+        title: "Error al seleccionar el archivo",
+        description: "No se seleccionó ningún archivo",
+        fill: "#FAB7FF",
+      });
+      return;
+    };
 
     try {
       setIsLoading(true);
@@ -49,6 +73,7 @@ export function LoadMaterial({
 
   return (
     <section className={styles.wrapper}>
+      <Toaster position="top-right" />
       <div className={styles.fileRow}>
         <label className={styles.mainLabel}>Nombre del documento: </label>
         {material.name ?
@@ -61,14 +86,7 @@ export function LoadMaterial({
       <div className={styles.urlBlock}>
         <label className={styles.mainLabel}>URL del documento: </label>
         {currentUrl ? (
-          <a
-            href={currentUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.urlLink}
-          >
-            {currentUrl}
-          </a>
+          <SeeIcon url={currentUrl} elementLabel="Documento" serial={material.name} />
         ) : (
           <span className={styles.urlFallback}>Documento no cargado.</span>
         )}
@@ -95,7 +113,7 @@ export function LoadMaterial({
           <input
             ref={inputRef}
             type="file"
-            accept="application/pdf,.pdf"
+            accept={onlyPdf ? "application/pdf,.pdf" : "application/pdf,.pdf,image/jpeg,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.ico,.webp"}
             className={styles.hiddenInput}
             onChange={handleFileChange}
             />

@@ -1,0 +1,48 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.description {
+  margin: 10px 0 10px 0;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.purchaseNumber {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.email {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.phone {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.supportInfo {
+  margin-top: 16px;
+  text-align: justify;
+  color: var(--color-primary-dark2);
+  font-weight: 600;
+}
+
+.documentContainer {
+  margin-top: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .supportInfo {
+    margin-top: 10px;
+  }
+}

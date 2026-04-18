@@ -39,7 +39,7 @@ export default function PackagePage() {
     setSubject("matematicas");
     setStatus("active");
     setPrice("");
-    setDocuments([]);
+    setCurrentMaterials([]);
     router.push("/admin/packageList");
   };
 

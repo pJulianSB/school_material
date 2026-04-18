@@ -20,12 +20,6 @@ export function SelectDocs({ documents, isLoading, subject, grade, currentMateri
 
     const availableMaterials = getAvailableMaterials(documents, currentMaterials);
 
-    console.log("documents !!!!")
-    console.log(documents);
-    console.log(availableMaterials);
-    console.log("documents !!!!")
-
-
     return availableMaterials.filter(doc => {
       const filterType = materialType === '' || doc.type === TYPE_MATERIAL_MAP[materialType];
       const filterDescription = description === '' || 
