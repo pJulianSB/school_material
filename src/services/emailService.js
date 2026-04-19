@@ -1,13 +1,13 @@
-// src/services/emailService.js
 import { Resend } from 'resend';
 import { PurchaseReceiptEmail } from 'app/emails/PurchaseReceiptEmail';
 
-const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_APP_SUPPORT_EMAIL;
 
 export const sendPurchaseReceipt = async ({ to, customerName, orderId, downloadLink }) => {
   try {
     const data = await resend.emails.send({
-      from: 'APPEducativa <noreply@appeducativa.com>',
+      from: `AppEducativa <${SUPPORT_EMAIL}>`,
       to: [to],
       subject: `Compra #${orderId} lista para descargar`,
       react: PurchaseReceiptEmail({ customerName, orderId, downloadLink }),

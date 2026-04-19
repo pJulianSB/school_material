@@ -2,12 +2,6 @@
 
 import { sendPurchaseReceipt } from 'app/services/emailService';
 
-/**
- * @param {Array} cartItems - The items from the Zustand store
- * @param {Object} customerData - Email, name, and payment token
- * @returns {Object} Result object with success status and optional data/error
- */
-
 export async function processOrderAction(cartItems, customerData) {
   try {
 
@@ -16,7 +10,7 @@ export async function processOrderAction(cartItems, customerData) {
       return { success: false, error: 'The cart is empty.' };
     }
 
-    const { email, name, paymentToken } = customerData;
+    const { email, name, downloadLink } = customerData;
     const paymentSuccessful = true; // Simulado para este ejemplo
 
     if (!paymentSuccessful) {
@@ -25,14 +19,19 @@ export async function processOrderAction(cartItems, customerData) {
 
     // REGISTRO EN BASE DE DATOS
     const orderId = `ORD-${Date.now().toString().slice(-6)}`;
-
+    
+    console.log('Checkout process started');
+    console.log(orderId);
     // 4. ENVÍO DEL CORREO (Notificación asíncrona)
     const emailResult = await sendPurchaseReceipt({
       to: email,
       customerName: name,
       orderId: orderId,
-      downloadLink: `https://tuplataforma.com/dashboard/downloads/${orderId}`
+      downloadLink: downloadLink
     });
+
+    console.log(emailResult);
+    console.log('Checkout process ended');
 
     if (!emailResult.success) {
       console.warn(`[WARNING] Order ${orderId} completed, but receipt email failed.`);
