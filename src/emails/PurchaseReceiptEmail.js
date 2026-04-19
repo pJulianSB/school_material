@@ -1,4 +1,4 @@
-import { Html, Body, Head, Heading, Container, Text, Link } from '@react-email/components';
+import { Html, Body, Head, Heading, Container, Text, Link } from 'react-email';
 
 export const PurchaseReceiptEmail = ({ customerName, orderId, downloadLink }) => {
   return (
@@ -6,13 +6,13 @@ export const PurchaseReceiptEmail = ({ customerName, orderId, downloadLink }) =>
       <Head />
       <Body style={{ fontFamily: 'sans-serif', backgroundColor: '#f6f9fc' }}>
         <Container style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-          <Heading>Thank you for your purchase, {customerName}!</Heading>
-          <Text>Your order #{orderId} has been successfully processed.</Text>
+          <Heading>Gracias por tu compra, {customerName}!</Heading>
+          <Text>Tu orden #{orderId} ha sido procesada correctamente.</Text>
           <Text>
-            You can now access your study materials by clicking the link below:
+            Ya puedes acceder a tus materiales de estudio haciendo clic en el siguiente enlace:
           </Text>
           <Link href={downloadLink} style={{ color: '#007bff' }}>
-            Download My Materials
+            Descargar Mis Materiales
           </Link>
         </Container>
       </Body>
