@@ -51,29 +51,38 @@ export default function PaymentPage() {
     setIsModalOpen(true);
   };
 
-  const handlePurchaseProcess = () => {
-    setErrorMessage(null);
+  const handlePurchaseProcess = async () => {
 
-    // Mock de los datos del cliente ingresados en un formulario previo
+    setErrorMessage(null);
+    const items = useCartStore.getState().cartItems;
     const customerData = {
-      email: 'student@example.com',
-      name: 'Jane Doe',
-      paymentToken: 'tok_12345' 
+      email: 'pjulian.sb@gmail.com',
+      name: 'Julian Salamanca',
+      downloadLink: items[0].materials[0].material_url,
     };
+    
+    console.log('Purchase process');
+    console.log(customerData);
+    console.log(items);
+    console.log('Purchase process');
 
     // startTransition mantiene la UI responsiva mientras el servidor trabaja
-    startTransition(async () => {
+    // startTransition(async () => {
       // Llamamos al Server Action directamente
-      const response = await processOrderAction(cartItems, customerData);
+    const response = await processOrderAction(items, customerData);
 
-      if (response.success) {
-        // Limpiamos el Zustand localStorage y redirigimos al éxito
-        clearCart();
-        router.push(`/success?order=${response.orderId}`);
-      } else {
-        setErrorMessage(response.error);
-      }
-    });
+    console.log('Response');
+    console.log(response);
+    console.log('Response');
+
+    if (response.success) {
+      // Limpiamos el Zustand localStorage y redirigimos al éxito
+      useCartStore.getState().clearCart();
+      router.push(`/items`);
+    } else {
+      setErrorMessage(response.error);
+    }
+    // });
   };
 
   return (
