@@ -53,14 +53,6 @@ export function NavBar() {
         Paquetes
       </Link>
       <Link
-        key="/company"
-        href="/company"
-        className={`${styles.link} ${pathname === "/company" ? styles.active : ""}`}
-        aria-current={pathname === "/company" ? "page" : undefined}
-      >
-        Empresa
-      </Link>
-      <Link
         key="/contact"
         href="/contact"
         className={`${styles.link} ${pathname === "/contact" ? styles.active : ""}`}

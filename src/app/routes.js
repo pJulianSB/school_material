@@ -1,5 +1,5 @@
 export const routes = [
-  { path: "/", label: "Items", title: "Asesorias Pedagógicas y Projección Educativa", subtitle: "Materiales para clases" },
+  { path: "/", label: "Items", title: "Asesorias Pedagógicas y Projección Educativa", subtitle: "" },
   { path: "/items", label: "Paquetes", title: "Lista de Paquetes", subtitle: "" },
   { path: "/company", label: "Empresa", title: "Asesorias Pedagógicas", subtitle: "Conoce nuestro equipo" },
   { path: "/contact", label: "Contacto", title: "Contáctanos", subtitle: "" },
