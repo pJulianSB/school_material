@@ -20,6 +20,8 @@ export const GRADES_OPTIONS = [
   { value: "septimo", label: "Septimo" },
   { value: "octavo", label: "Octavo" },
   { value: "noveno", label: "Noveno" },
+  { value: "decimo", label: "Decimo" },
+  { value: "undecimo", label: "Undecimo" },
 ];
 
 export const GRADES_MAP = GRADES_OPTIONS.reduce((acc, opcion) => {
@@ -33,6 +35,12 @@ export const SUBJECTS_OPTIONS = [
   { value: "ciencias", label: "Ciencias Naturales" },
   { value: "sociales", label: "Ciencias Sociales" },
   { value: "ingles", label: "Inglés" },
+  { value: "educacion_fisica", label: "Educación Física" },
+  { value: "etica_valores", label: "Ética y valores" },
+  { value: "religion", label: "Religión" },
+  { value: "educacion_artistica", label: "Educación Artística" },
+  { value: "filosofia", label: "Filosofía" },
+  { value: "economia_politica", label: "Economía y política" },
 ];
 
 export const SUBJECTS_MAP = SUBJECTS_OPTIONS.reduce((acc, opcion) => {

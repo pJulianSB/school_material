@@ -21,14 +21,14 @@ export function Footer() {
           <div className={styles.columnImage}>
             <Image
               src={PROFILE_IMAGE}
-              alt="Pablo Julian Salamanca"
+              alt="Aurelio Lopez Medina"
               width={65}
               height={65}
               rounded={50}
             />
           </div>
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Aurelio Lopez Medina</h2>
+            <h2 className={styles.cardTitle}>Aurelio Lopéz Medina</h2>
             <p className={styles.cardSubtitle}>
               <a href="mailto:aulomepedagogia@gmail.com">aulomepedagogia@gmail.com</a>
             </p>
@@ -73,7 +73,7 @@ export function Footer() {
                 disabled={false}
                 onClick={() => router.push("/contact")}
               >
-                Contactanos!
+                Contáctanos!
               </SecondaryButton>
             </div>
           </div>
