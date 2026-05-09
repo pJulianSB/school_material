@@ -92,7 +92,7 @@ export default function ContactPage() {
     <div className={styles.page}>
       <section className={styles.card}>
         <h2 className={styles.title}>
-          ¿Tienes un proyecto en el cual desees trabajar con nosotros?, vamos a dialogar y encontrar el mejor camino para tu idea
+          ¿Tienes un proyecto en el cual desees trabajar con nosotros?. Vamos a dialogar y encontrar el mejor camino para tu idea
         </h2>
         <section className={styles.formGrid}>
           <div className={styles.column}>

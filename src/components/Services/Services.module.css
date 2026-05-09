@@ -72,9 +72,32 @@
 .cardDescription {
   margin: 0;
   color: var(--color-primary-dark2);
-  text-align: center;
+  text-align: justify;
   line-height: 1.45;
   font-size: 0.93rem;
+}
+
+.cardList {
+  padding: 5px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cardItem {
+  margin: 0;
+  color: var(--color-primary-dark2);
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.cardAction {
+  margin: 0;
+  color: var(--color-primary-dark2);
+  font-size: 0.93rem;
+  line-height: 1.45;
+  font-weight: 600;
+  text-align: center;
 }
 
 @media (max-width: 1080px) {

@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "app/components/Header/Header";
 import { Footer } from "app/components/Footer/Footer";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Analytics />
         <div className="layoutWrapper">
           <Header />
           <main className="layoutContent">
