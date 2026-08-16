@@ -10,7 +10,7 @@
 .backgroundLayer {
   position: absolute;
   inset: 0;
-  background: url("/home/background.png");
+  background: url("/home/background.webp");
 }
 
 .content {
@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .title {
@@ -48,10 +48,14 @@
   gap: 12px;
   color: var(--color-primary-dark2);
   text-align: justify;
-  font-weight: 600;
+  font-weight: 520;
   line-height: 1.5;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
+}
+
+.textStrong {
+  font-weight: 600;
 }
 
 .imageColumn {
