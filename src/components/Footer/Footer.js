@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 const PROFILE_IMAGE = "/app/profile.jpeg";
 const WHATSAPP_ICON = "/whatsapp.svg";
 const LINKEDIN_ICON = "/linkedin.svg";
+const INSTAGRAM_ICON = "/Instagram.svg";
 const WHATSAPP_URL = "https://wa.me/";
 const LINKEDIN_URL = "https://www.linkedin.com/in/";
+const INSTAGRAM_URL = "https://www.instagram.com/asesoriaspedag.aureliolopez";
 
 export function Footer() {
   const router = useRouter();
@@ -21,14 +23,14 @@ export function Footer() {
           <div className={styles.columnImage}>
             <Image
               src={PROFILE_IMAGE}
-              alt="Aurelio Lopez Medina"
+              alt="Aurelio López Medina"
               width={65}
               height={65}
               rounded={50}
             />
           </div>
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Aurelio Lopéz Medina</h2>
+            <h2 className={styles.cardTitle}>Aurelio López Medina</h2>
             <p className={styles.cardSubtitle}>
               <a href="mailto:aulomepedagogia@gmail.com">aulomepedagogia@gmail.com</a>
             </p>
@@ -67,13 +69,27 @@ export function Footer() {
                     rounded={50}
                     />
                 </a>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  >
+                  <Image
+                    src={INSTAGRAM_ICON}
+                    alt="Instagram"
+                    width={24}
+                    height={24}
+                    rounded={50}
+                    />
+                </a>
               </div>
               <SecondaryButton
                 type="button"
                 disabled={false}
                 onClick={() => router.push("/contact")}
               >
-                Contáctanos!
+                ¡Contáctanos!
               </SecondaryButton>
             </div>
           </div>
