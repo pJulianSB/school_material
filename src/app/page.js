@@ -5,8 +5,8 @@ import { Services } from "app/components/Services/Services";
 import { CompanyValue } from "app/components/CompanyValue/CompanyValue";
 import { PrimaryButton } from "app/components/ui/PrimaryButton";
 
-const BANNER_IMAGE = "/home/banner4.png";
-const BANNER_IMAGE2 = "/home/banner2.png";
+const BANNER_IMAGE = "/home/banner4.webp";
+const BANNER_IMAGE2 = "/home/banner2.webp";
 const bannerTitle2 = "Materiales de clase que potencian tu enseñanza.";
 const bannerDescription2 = "Encuentra recursos pedagógicos estructurados y adaptados a tus necesidades para desarrollar clases inolvidables y dinámicas.";
 const bannerButtonText2 = "Ver catálogo de materiales";

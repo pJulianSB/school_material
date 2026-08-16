@@ -6,25 +6,25 @@ const TUTORIAL_STEPS = [
     title: "Seleccionar paquetes",
     description: `Explora la lista de paquetes que tenemos para diferentes áreas y grados, 
      podrás seleccionar los paquetes que más te interesen y agregarlos al carrito de compras.`,
-    image: "/home/stepA.png",
+    image: "/home/stepA.webp",
   },
   {
     number: 2,
     title: "Realizar el pago",
     description: "Para realizar el pago, selecciona el método de pago que prefieras y sigue las instrucciones para completar la transacción.",
-    image: "/home/stepB.png",
+    image: "/home/stepB.webp",
   },
   {
     number: 3,
     title: "Adjuntar comprobante",
     description: "Adjunta el comprobante de pago para validar la compra. En el transcurso de 24 horas, recibirás un correo electrónico con el material adquirido.",
-    image: "/home/stepC.png",
+    image: "/home/stepC.webp",
   },
   {
     number: 4,
     title: "Revisar correo",
     description: "Recibirás un correo electrónico con el material, puedes revisarlo y si tienes alguna inquietud puedes comunicarte con nuestro equipo de soporte al correo soporte@appeeducativa.com.",
-    image: "/home/stepD.png",
+    image: "/home/stepD.webp",
   },
 ];
 
